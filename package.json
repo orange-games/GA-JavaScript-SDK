@@ -1,0 +1,33 @@
+{
+    "name": "GA-JavaScript-SDK",
+    "author": "Gembly BV",
+    "version": "1.0.0",
+    "description": "Unofficial JavaScript SDK for GameAnalytics",
+    "keywords": [
+        "GameAnalytics",
+        "JavaScript"
+    ],
+    "contributors": [
+        {
+            "name": "Ale Bles",
+            "email": "ale@gembly.com"
+        }
+    ],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://raw.githubusercontent.com/gembly/GA-JavaScript-SDK/master/LICENSE"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gembly/GA-JavaScript-SDK"
+    },
+    "devDependencies": {
+        "grunt": "0.4.x",
+        "grunt-typescript": "0.4.x"
+    },
+    "engines": {
+        "node": "0.10.33"
+    }
+}
