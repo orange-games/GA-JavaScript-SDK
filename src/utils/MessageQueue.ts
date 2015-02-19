@@ -1,4 +1,4 @@
-/// <reference path="references.ts" />
+/// <reference path="../references.ts" />
 
 /**
  * A message queue that stores messages that need to be send to GA
@@ -9,6 +9,7 @@ class MessageQueue
     private designQueue:Array<Message> = [];
     private businessQueue:Array<Message> = [];
     private errorQueue:Array<Message> = [];
+    private userQueue:Array<Message> = [];
 
     /**
      * Load possible old queue from localStorage
@@ -46,6 +47,8 @@ class MessageQueue
                 return this.businessQueue;
             case GameAnalyticsEvent.ERROR_EVENT:
                 return this.errorQueue;
+            case GameAnalyticsEvent.USER_EVENT:
+                return this.userQueue;
             case GameAnalyticsEvent.DESIGN_EVENT:
             default:
                 return this.designQueue;
@@ -68,6 +71,7 @@ class MessageQueue
         switch (event) {
             case GameAnalyticsEvent.BUSINESS_EVENT:
             case GameAnalyticsEvent.DESIGN_EVENT:
+            case GameAnalyticsEvent.USER_EVENT:
             case GameAnalyticsEvent.ERROR_EVENT:
                 break;
         }

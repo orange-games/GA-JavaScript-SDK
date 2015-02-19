@@ -1,4 +1,4 @@
-/// <reference path="references.ts" />
+/// <reference path="../references.ts" />
 
 class GARequest
 {
@@ -15,8 +15,8 @@ class GARequest
             }
         };
 
-        xhr.open('POST', url);
-        xhr.setRequestHeader('Authorisation', authHeader);
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Authorization', authHeader);
         xhr.setRequestHeader('Content-Type', 'text/plain');
         xhr.send(data);
     }

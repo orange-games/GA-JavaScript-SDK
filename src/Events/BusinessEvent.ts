@@ -3,7 +3,7 @@
 /**
  * Business event
  */
-class BusinessEvent extends GameAnalyticsEvent
+class BusinessEvent extends GeneralEvent
 {
     constructor(eventId:string, value?:number, area?: string, x?:number, y?:number, z?:number)
     {

@@ -1,4 +1,4 @@
-/// <reference path="references.ts" />
+/// <reference path="../references.ts" />
 
 /**
  * Message
@@ -31,7 +31,7 @@ class Message
     {
         try {
             var d = JSON.parse(data);
-            var e = new GameAnalyticsEvent(event, d.eventId, d.value, d.area, d.x , d.y, d.z);
+            var e = new GeneralEvent(event, d.eventId, d.value, d.area, d.x , d.y, d.z);
 
             return new Message(e, d.userId, d.sessionId, d.build);
         } catch (e) {}
@@ -47,30 +47,16 @@ class Message
     get data(): Object
     {
         var data:any =  {
-            event_id: this.e.eventId,
             user_id: this.userId,
             session_id: this.sessionId,
             build: this.build
         };
 
-        if (null !== this.e.value) {
-            data.value = this.e.value;
-        }
-
-        if (null !== this.e.area) {
-            data.area = this.e.area;
-        }
-
-        if (null !== this.e.x) {
-            data.x = this.e.x;
-        }
-
-        if (null !== this.e.y) {
-            data.y = this.e.y;
-        }
-
-        if (null !== this.e.z) {
-            data.z = this.e.z;
+        var eventData = this.e.getData();
+        for (var property in eventData) {
+            if (eventData.hasOwnProperty(property) && eventData[property] !== null) {
+                data[property] = eventData[property];
+            }
         }
 
         return data;

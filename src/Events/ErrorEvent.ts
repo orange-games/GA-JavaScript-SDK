@@ -4,7 +4,7 @@
  * Error event
  * Used this to send any errors to GA
  */
-class GaErrorEvent extends GameAnalyticsEvent
+class GaErrorEvent extends GeneralEvent
 {
     constructor(eventId:string, value?:number, area?: string, x?:number, y?:number, z?:number)
     {

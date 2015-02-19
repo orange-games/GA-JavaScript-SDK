@@ -3,6 +3,7 @@
  * GameAnalytics lib
  */
 declare class GameAnalytics {
+    static SDK_VERSION: string;
     private gameKey;
     private secretKey;
     private build;
@@ -59,6 +60,7 @@ declare class MessageQueue {
     private designQueue;
     private businessQueue;
     private errorQueue;
+    private userQueue;
     /**
      * Load possible old queue from localStorage
      */
@@ -121,6 +123,10 @@ declare class GAUniqueidUtil {
 declare class GARequest {
     static post(url: string, data: string, authHeader: string, callback: Function): void;
 }
+declare class GADeviceUtil {
+    constructor();
+    static createUserEventDeviceObject(sdkVersion: String): any;
+}
 /**
  * Generic event, all event types inherit from this
  */
@@ -128,7 +134,15 @@ declare class GameAnalyticsEvent {
     static DESIGN_EVENT: string;
     static BUSINESS_EVENT: string;
     static ERROR_EVENT: string;
+    static USER_EVENT: string;
     event: string;
+    constructor(event: string);
+    getData(): any;
+}
+/**
+ * Generic event, all event types inherit from this
+ */
+declare class GeneralEvent extends GameAnalyticsEvent {
     eventId: string;
     value: number;
     area: string;
@@ -136,24 +150,33 @@ declare class GameAnalyticsEvent {
     y: number;
     z: number;
     constructor(event: string, eventId?: string, value?: number, area?: string, x?: number, y?: number, z?: number);
+    getData(): any;
 }
 /**
  * Design event
  * use this to do regular gameplay shizzle
  */
-declare class DesignEvent extends GameAnalyticsEvent {
+declare class DesignEvent extends GeneralEvent {
     constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
 }
 /**
  * Error event
  * Used this to send any errors to GA
  */
-declare class GaErrorEvent extends GameAnalyticsEvent {
+declare class GaErrorEvent extends GeneralEvent {
     constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
 }
 /**
  * Business event
  */
-declare class BusinessEvent extends GameAnalyticsEvent {
+declare class UserEvent extends GameAnalyticsEvent {
+    private userData;
+    constructor(userData: any);
+    getData(): any;
+}
+/**
+ * Business event
+ */
+declare class BusinessEvent extends GeneralEvent {
     constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
 }

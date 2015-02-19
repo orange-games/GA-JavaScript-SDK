@@ -5,6 +5,8 @@
  */
 class GameAnalytics
 {
+    public static SDK_VERSION:string = 'Javascript 0.2.0';
+
     private gameKey: string;
     private secretKey: string;
     private build: string;
@@ -47,6 +49,8 @@ class GameAnalytics
         this.secretKey = secretKey;
         this.build = build;
         this.userId = userId;
+
+        this.sendEvent(new UserEvent(GADeviceUtil.createUserEventDeviceObject(GameAnalytics.SDK_VERSION)));
     }
 
     /**
@@ -138,8 +142,8 @@ class GameAnalytics
             url,
             databag,
             authHeader,
-            () => {
-                //console.log("Success! response: " + response);
+            (response) => {
+                console.log("Success! response: " + response);
             }
         );
     }

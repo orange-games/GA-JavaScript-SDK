@@ -4,7 +4,7 @@
  * Design event
  * use this to do regular gameplay shizzle
  */
-class DesignEvent extends GameAnalyticsEvent
+class DesignEvent extends GeneralEvent
 {
     constructor(eventId:string, value?:number, area?: string, x?:number, y?:number, z?:number)
     {
