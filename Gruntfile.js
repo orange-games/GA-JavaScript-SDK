@@ -2,12 +2,13 @@ module.exports = function (grunt) {
     'use strict';
 
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         typescript: {
             gembly: {
                 src: [
                     'src/**/*.ts'
                 ],
-                dest: 'bin/GaJavaScriptSdk.min.js',
+                dest: 'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js',
                 options: {
                     module: 'amd',
                     target: 'es5',
@@ -19,15 +20,15 @@ module.exports = function (grunt) {
         },
         uglify: {
             options: {
-                compress: true,
+                compress: {},
                 mangle: true,
                 beautify: false
             },
             gembly: {
                 files: {
-                    'bin/GaJavaScriptSdk.min.js': [
+                    'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js': [
                         'vendor/md5.js',
-                        'bin/GaJavaScriptSdk.min.js'
+                        'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js'
                     ]
                 }
             }
