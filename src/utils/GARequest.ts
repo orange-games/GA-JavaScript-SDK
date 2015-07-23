@@ -14,7 +14,7 @@ class GARequest
                         success: true,
                         message: 'Success: ' + xhr.responseText
                     });
-                } else {
+                } else if (xhr.status > 0){
                     callback({
                         success: false,
                         message: 'Error: There was a problem with the request: status ' + xhr.status
