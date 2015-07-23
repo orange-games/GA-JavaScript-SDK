@@ -9,7 +9,7 @@ class GARequest
             xhr = new XMLHttpRequest();
             xhr.onreadystatechange=function()
             {
-                if (xhr.readyState==4 && xhr.status==200){
+                if (xhr.status === 200){
                     callback({
                         success: true,
                         message: 'Success: ' + xhr.responseText
