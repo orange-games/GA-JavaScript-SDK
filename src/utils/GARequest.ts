@@ -4,20 +4,42 @@ class GARequest
 {
     public static post(url:string, data:string, authHeader:string, callback: Function)
     {
-        var xhr:XMLHttpRequest = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    callback(xhr.responseText);
+        var xhr;
+        if ((<any>window).XMLHttpRequest) {
+            xhr = new XMLHttpRequest();
+            xhr.onreadystatechange=function()
+            {
+                if (xhr.readyState==4 && xhr.status==200){
+                    callback({
+                        success: true,
+                        message: 'Success: ' + xhr.responseText
+                    });
                 } else {
-                    callback('There was a problem with the request: status ' + xhr.status);
+                    callback({
+                        success: false,
+                        message: 'Error: There was a problem with the request: status ' + xhr.status
+                    });
                 }
-            }
-        };
+            };
+        } else {
+            callback({
+                success: false,
+                message: 'Error: Unable to send request, XMLHttpRequest not supported'
+            });
+            return;
+        }
 
-        xhr.open('POST', url, true);
-        xhr.setRequestHeader('Authorization', authHeader);
-        xhr.setRequestHeader('Content-Type', 'text/plain');
-        xhr.send(data);
+        try {
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Authorization', authHeader);
+            xhr.setRequestHeader('Content-Type', 'text/plain');
+            xhr.send(data);
+        } catch (e) {
+            callback({
+                success: false,
+                message: 'Error: Unable to send request, CORS not allowed.'
+            });
+        }
     }
+
 }

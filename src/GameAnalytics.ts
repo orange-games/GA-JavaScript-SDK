@@ -5,7 +5,7 @@
  */
 class GameAnalytics
 {
-    public static SDK_VERSION:string = 'Javascript 0.2.0';
+    public static SDK_VERSION:string = 'Javascript 1.1.0';
 
     private gameKey: string;
     private secretKey: string;
@@ -13,7 +13,7 @@ class GameAnalytics
     private userId: string;
     private sessionId: string = GAUniqueidUtil.createUniqueId();
 
-    private apiUrl:string = 'https://api.gameanalytics.com/1/';
+    private apiUrl:string = window.location.protocol + '//api.gameanalytics.com/1/';
     private messageQueue:MessageQueue = new MessageQueue()
 
     private static instance:GameAnalytics = null;
@@ -143,7 +143,11 @@ class GameAnalytics
             databag,
             authHeader,
             (response) => {
-                console.log("Success! response: " + response);
+                if (response.success === false) {
+                    if (window.console) {
+                        console.log(response.message);
+                    }
+                }
             }
         );
     }

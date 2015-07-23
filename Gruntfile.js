@@ -4,7 +4,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         typescript: {
-            gembly: {
+            build: {
                 src: [
                     'src/**/*.ts'
                 ],
@@ -13,7 +13,7 @@ module.exports = function (grunt) {
                     module: 'amd',
                     target: 'es5',
                     basePath: 'src',
-                    sourceMap: false,
+                    sourceMap: true,
                     declaration: true
                 }
             }
@@ -24,7 +24,7 @@ module.exports = function (grunt) {
                 mangle: true,
                 beautify: false
             },
-            gembly: {
+            typescript: {
                 files: {
                     'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js': [
                         'vendor/md5.js',
