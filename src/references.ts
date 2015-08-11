@@ -2,15 +2,15 @@
 
 /// <reference path="GameAnalytics.ts" />
 
-/// <reference path="utils/MessageQueue.ts" />
-/// <reference path="utils/Message.ts" />
-/// <reference path="utils/GAUniqueidUtil.ts" />
-/// <reference path="utils/GARequest.ts" />
-/// <reference path="utils/GADeviceUtil.ts" />
+/// <reference path="GA/MessageQueue.ts" />
+/// <reference path="GA/Message.ts" />
+/// <reference path="GA/GAUniqueidUtil.ts" />
+/// <reference path="GA/GARequest.ts" />
+/// <reference path="GA/GADeviceUtil.ts" />
 
-/// <reference path="Events/GameAnalyticsEvent.ts" />
-/// <reference path="Events/GeneralEvent.ts" />
-/// <reference path="Events/DesignEvent.ts" />
-/// <reference path="Events/BusinessEvent.ts" />
-/// <reference path="Events/ErrorEvent.ts" />
-/// <reference path="Events/UserEvent.ts" />
+/// <reference path="GA/Events/GameAnalyticsEvent.ts" />
+/// <reference path="GA/Events/GeneralEvent.ts" />
+/// <reference path="GA/Events/DesignEvent.ts" />
+/// <reference path="GA/Events/BusinessEvent.ts" />
+/// <reference path="GA/Events/ErrorEvent.ts" />
+/// <reference path="GA/Events/UserEvent.ts" />

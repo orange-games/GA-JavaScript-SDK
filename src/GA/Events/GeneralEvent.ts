@@ -1,4 +1,4 @@
-/// <reference path="../references.ts" />
+/// <reference path="../../references.ts" />
 
 /**
  * Generic event, all event types inherit from this

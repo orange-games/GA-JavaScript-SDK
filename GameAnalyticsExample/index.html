@@ -4,13 +4,19 @@
     <title>GameAnalytics for Javascript example</title>
 
     <!-- Game Analytics inclusion -->
-    <script type="text/javascript" src="../bin/GaJavaScriptSdk-1.1.0.min.js"></script>
+    <script type="text/javascript" src="../bin/GaJavaScriptSdk-2.0.0.min.js"></script>
 
     <!-- Let's setup gameanalytics -->
     <script type="text/javascript">
-        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
-        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
-        var build = "1.0"; //The current version of your game, it's wise to bump this with every analytics/game change
+        //For the test game
+//        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
+//        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
+
+        //Sandbox variables
+        var gameKey = "5c6bcb5402204249437fb5a7a80a4959";
+        var secretKey = "16813a12f718bc5c620f56944e1abc3ea13ccbac";
+
+        var build = "2.0"; //The current version of your game, it's wise to bump this with every analytics/game change
         var user = Date.now().toString(); //Unique user ID, handy for getting sessions
 
         //Create an instance

@@ -1,5 +1,11 @@
 /// <reference path="../references.ts" />
 
+interface DeviceObject {
+    sdk_version: string;
+    platform: string;
+    os_version: string;
+}
+
 class GADeviceUtil
 {
     constructor()
@@ -42,6 +48,40 @@ class GADeviceUtil
             var userOSver = ua.substr(uaindex + 3, 3);
             obj.os_major = "Windows Phone " + userOSver[0];
             obj.os_minor = "Windows Phone " + userOSver;
+        }
+
+        return obj;
+    }
+
+
+    public static createInitEventDeviceObject(sdkVersion: string): DeviceObject
+    {
+        var obj: DeviceObject = {
+            sdk_version: sdkVersion,
+            platform: 'unknown',
+            os_version: 'unknown'
+        };
+
+        var ua:string = navigator.userAgent;
+
+        if(ua.match(/iPad|iPod|iPhone/i)){
+            //code for iPad here
+            obj.platform = "iOS";
+
+            var uaindex = ua.indexOf('iOS ');
+            obj.os_version = ua.substr(uaindex, 6).replace('_', '.');
+        } else if(ua.match(/Android/i)){
+            //code for Android here
+            obj.platform = "Android";
+
+            var uaindex = ua.indexOf('Android ');
+            obj.os_version =  ua.substr(uaindex, 11);
+        } else if(ua.match(/Windows Phone/i)){
+            //code for Windows phone here
+            obj.platform = "Windows";
+
+            var uaindex = ua.indexOf('Windows Phone ');
+            obj.os_version = ua.substr(uaindex, 17);
         }
 
         return obj;

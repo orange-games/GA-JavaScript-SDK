@@ -18,6 +18,9 @@ module.exports = function (grunt) {
                 }
             }
         },
+        clean: {
+            build: ["bin"]
+        },
         uglify: {
             options: {
                 compress: {},
@@ -27,7 +30,8 @@ module.exports = function (grunt) {
             typescript: {
                 files: {
                     'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js': [
-                        'vendor/md5.js',
+                        'vendor/hmac-sha256.js',
+                        'vendor/enc-base64-min.js',
                         'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js'
                     ]
                 }
@@ -37,6 +41,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-typescript');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
-    grunt.registerTask('build', ['typescript', 'uglify']);
+    grunt.registerTask('build', ['clean', 'typescript', 'uglify']);
 };

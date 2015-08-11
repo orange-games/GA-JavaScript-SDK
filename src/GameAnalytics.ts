@@ -5,7 +5,14 @@
  */
 class GameAnalytics
 {
-    public static SDK_VERSION:string = 'Javascript 1.1.0';
+    /**
+     * Version showing in gameanalytics, I prefer Javascript 2.x.x but docs state
+     * //Custom solutions should ALWAYS use the string “rest api v2”
+     *
+     * @type {string}
+     */
+    //public static SDK_VERSION:string = 'Javascript 2.0.0';
+    public static SDK_VERSION:string = 'rest api v2';
 
     private gameKey: string;
     private secretKey: string;
@@ -13,10 +20,17 @@ class GameAnalytics
     private userId: string;
     private sessionId: string = GAUniqueidUtil.createUniqueId();
 
-    private apiUrl:string = window.location.protocol + '//api.gameanalytics.com/1/';
-    private messageQueue:MessageQueue = new MessageQueue()
+    private apiUrl:string = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
+    private messageQueue:MessageQueue = new MessageQueue();
 
     private static instance:GameAnalytics = null;
+
+    /**
+     * Used to check if events can be sent to the API, set based on the response of the init request
+     *
+     * @type {boolean}  events are only send of true
+     */
+    private enabled: boolean = false;
 
     /**
      * Fetches an created instance
@@ -50,7 +64,11 @@ class GameAnalytics
         this.build = build;
         this.userId = userId;
 
-        this.sendEvent(new UserEvent(GADeviceUtil.createUserEventDeviceObject(GameAnalytics.SDK_VERSION)));
+        //this.sendEvent(new UserEvent(GADeviceUtil.createUserEventDeviceObject(GameAnalytics.SDK_VERSION)));
+        var initEvent = new InitEvent(GADeviceUtil.createInitEventDeviceObject(GameAnalytics.SDK_VERSION));
+        this.send(initEvent.toString(), GameAnalyticsEvent.INIT_EVENT, (response: string) => {
+
+        });
     }
 
     /**
@@ -76,6 +94,10 @@ class GameAnalytics
      */
     public sendEvent(e:GameAnalyticsEvent)
     {
+        if (this.enabled === false) {
+            return;
+        }
+
         if (null === GameAnalytics.instance) {
             throw new Error('No instance available!');
         }
@@ -94,6 +116,10 @@ class GameAnalytics
      */
     public sendData()
     {
+        if (this.enabled === false) {
+            return;
+        }
+
         if (null === GameAnalytics.instance) {
             throw new Error('No instance available!');
         }
@@ -122,9 +148,11 @@ class GameAnalytics
     /**
      * Sends a message to GA
      *
-     * @param m
+     * @param databag
+     * @param event
+     * @param responseHandler
      */
-    private send(databag:string, event:string)
+    private send(databag:string, event:string, responseHandler: (response: string) => void = null)
     {
         if (null === GameAnalytics.instance && null === this.gameKey) {
             throw new Error('No instance available!');
@@ -133,10 +161,13 @@ class GameAnalytics
         if (databag.length < 1) {
             return;
         }
-
-        var md5msg = CryptoJS.MD5(databag + this.secretKey);
-        var authHeader:string = CryptoJS.enc.Hex.stringify(md5msg);
+        console.log('data', databag);
+        var encryptedMessage = CryptoJS.HmacSHA256(databag, this.secretKey);
+        var authHeader:string = CryptoJS.enc.Base64.stringify(encryptedMessage);
         var url:string = this.apiUrl + this.gameKey + '/' + event;
+
+        console.log('Authheader', authHeader);
+        console.log('url', url);
 
         GARequest.post(
             url,
@@ -146,6 +177,10 @@ class GameAnalytics
                 if (response.success === false) {
                     if (window.console) {
                         console.log(response.message);
+                    }
+
+                    if (responseHandler != null) {
+                        responseHandler(response);
                     }
                 }
             }

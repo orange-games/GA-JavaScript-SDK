@@ -32,7 +32,7 @@ class GARequest
         try {
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Authorization', authHeader);
-            xhr.setRequestHeader('Content-Type', 'text/plain');
+            xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(data);
         } catch (e) {
             callback({

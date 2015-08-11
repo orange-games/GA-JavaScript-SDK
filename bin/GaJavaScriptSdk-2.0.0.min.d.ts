@@ -3,6 +3,12 @@
  * GameAnalytics lib
  */
 declare class GameAnalytics {
+    /**
+     * Version showing in gameanalytics, I prefer Javascript 2.x.x but docs state
+     * //Custom solutions should ALWAYS use the string “rest api v2”
+     *
+     * @type {string}
+     */
     static SDK_VERSION: string;
     private gameKey;
     private secretKey;
@@ -12,6 +18,12 @@ declare class GameAnalytics {
     private apiUrl;
     private messageQueue;
     private static instance;
+    /**
+     * Used to check if events can be sent to the API, set based on the response of the init request
+     *
+     * @type {boolean}  events are only send of true
+     */
+    private enabled;
     /**
      * Fetches an created instance
      *
@@ -48,9 +60,11 @@ declare class GameAnalytics {
     /**
      * Sends a message to GA
      *
-     * @param m
+     * @param databag
+     * @param event
+     * @param responseHandler
      */
-    private send(databag, event);
+    private send(databag, event, responseHandler?);
 }
 /**
  * A message queue that stores messages that need to be send to GA
@@ -123,9 +137,15 @@ declare class GAUniqueidUtil {
 declare class GARequest {
     static post(url: string, data: string, authHeader: string, callback: Function): void;
 }
+interface DeviceObject {
+    sdk_version: string;
+    platform: string;
+    os_version: string;
+}
 declare class GADeviceUtil {
     constructor();
     static createUserEventDeviceObject(sdkVersion: String): any;
+    static createInitEventDeviceObject(sdkVersion: string): DeviceObject;
 }
 /**
  * Generic event, all event types inherit from this
@@ -135,9 +155,14 @@ declare class GameAnalyticsEvent {
     static BUSINESS_EVENT: string;
     static ERROR_EVENT: string;
     static USER_EVENT: string;
+    static INIT_EVENT: string;
     event: string;
     constructor(event: string);
     getData(): any;
+}
+interface IGameAnalyticsEvent {
+    event: string;
+    toString(): string;
 }
 /**
  * Generic event, all event types inherit from this
@@ -179,4 +204,13 @@ declare class UserEvent extends GameAnalyticsEvent {
  */
 declare class BusinessEvent extends GeneralEvent {
     constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
+}
+/**
+ * Init event, should be called when a new session starts
+ */
+declare class InitEvent implements IGameAnalyticsEvent {
+    event: string;
+    data: DeviceObject;
+    constructor(data: DeviceObject);
+    toString(): string;
 }
