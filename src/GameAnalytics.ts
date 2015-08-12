@@ -21,6 +21,8 @@ module GA
      */
     export class GameAnalytics
     {
+        public static SCHEDULE_TIME: number = 15000;
+
         /**
          * Version showing in GameAnalytics, I prefer Javascript 2.x.x but docs state
          * //Custom solutions should ALWAYS use the string “rest api v2”
@@ -28,18 +30,55 @@ module GA
          * @type {string}
          */
         //public static SDK_VERSION:string = 'Javascript 2.0.0';
-        public static SDK_VERSION:string = 'rest api v2';
+        public static SDK_VERSION: string = 'rest api v2';
 
+        /**
+         * The url for GameAnalytics' API
+         *
+         * @type {string}
+         */
+        public static API_URL: string = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
+
+        /**
+         * Stored instance for GameAnalytics
+         *
+         * @type {GameAnalytics}
+         */
+        public static instance: GameAnalytics = null;
+
+        /**
+         * The key of the game, provided by GameAnalytics
+         */
         private gameKey: string;
+
+        /**
+         * The secret to sign the request, provided by GameAnalytics
+         */
         private secretKey: string;
+
+        /**
+         * The build version of the game
+         */
         private build: string;
+
+        /**
+         * The unique ID of the playing user
+         */
         private userId: string;
+
+        /**
+         * The current sesison of the playing user
+         *
+         * @type {string}
+         */
         private sessionId: string = Utils.createUniqueId();
 
-        private apiUrl:string = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
-        private messageQueue:MessageQueue = new MessageQueue();
-
-        public static instance:GameAnalytics = null;
+        /**
+         * Queue of messages for GameAnalytics, will be drained every 15 seconds or when a user calls sendData
+         *
+         * @type {GA.MessageQueue}
+         */
+        private messageQueue: MessageQueue = new MessageQueue();
 
         /**
          * Used to check if events can be sent to the API, set based on the response of the init request
@@ -48,7 +87,19 @@ module GA
          */
         private enabled: boolean = false;
 
+        /**
+         * If the init call has ben processed or not. If not, we reschedule sendData() calls so we make sure data is send
+         *
+         * @type {boolean}
+         */
         private initProcessed: boolean = false;
+
+        /**
+         * The message queue gets drained every 15 seconds, but we reset this time when sendData() was called manually
+         *
+         * @type {number}
+         */
+        private timeoutId: number = 0;
 
         /**
          * An integer timestamp of the current server time in UTC (seconds since EPOCH).
@@ -86,6 +137,14 @@ module GA
                 }
             });
 
+            //Start the interval. The queue should be emptied every 15 seconds
+            this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
+
+            //Also make sure the queue is empty before we leave the page
+            window.addEventListener('beforeunload', () => {
+               this.sendData();
+            });
+
             return this;
         }
 
@@ -113,15 +172,12 @@ module GA
         {
             if (this.initProcessed === false) {
                 //Init not yet processed, try again in 1 second
-                setTimeout(() => {
-                    this.sendData();
-                }, 1000);
-
-                return;
+                this.scheduleSendData(1000);
+                return this;
             }
 
             if (this.enabled === false) {
-                return;
+                return this;
             }
 
             if (null === GameAnalytics.instance) {
@@ -138,7 +194,8 @@ module GA
 
 
             if (0 === data.length) {
-                return;
+                this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
+                return this;
             }
 
             try {
@@ -147,7 +204,23 @@ module GA
 
             this.sendEvent(d, 'events');
 
+            //Reschedule this method
+            this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
             return this;
+        }
+
+        /**
+         * Schedules the next time for a sendData call
+         *
+         * @param time  The time in ms until the next sendData call
+         */
+        private scheduleSendData(time: number): void
+        {
+            //Reschedule this method
+            clearTimeout(this.timeoutId);
+            this.timeoutId = setTimeout(() => {
+                this.sendData();
+            }, time);
         }
 
         /**
@@ -169,7 +242,7 @@ module GA
 
             var encryptedMessage = CryptoJS.HmacSHA256(databag, this.secretKey);
             var authHeader:string = CryptoJS.enc.Base64.stringify(encryptedMessage);
-            var url:string = this.apiUrl + this.gameKey + '/' + event;
+            var url:string = GameAnalytics.API_URL + this.gameKey + '/' + event;
 
             GA.Utils.postRequest(
                 url,

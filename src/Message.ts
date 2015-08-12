@@ -9,8 +9,14 @@ module GA
      */
     export class Message
     {
+        /**
+         * The Event we would like to send to GameAnalytics
+         */
         private event: Events.Event;
 
+        /**
+         * Some default data that needs to be send with any event
+         */
         private annotations: Utils.DefaultAnnotations;
 
         constructor(event: Events.Event, annotations: Utils.DefaultAnnotations)

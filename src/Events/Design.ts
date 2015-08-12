@@ -4,6 +4,8 @@ module GA
 {
     export module Events
     {
+        var eventIdCheck = /^[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}(:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}){0,4}$/;
+
         export class Design implements GA.Events.IdEvent
         {
             /**
@@ -25,7 +27,10 @@ module GA
 
             constructor(event_id: string, value?: number)
             {
-                //TODO: validation
+                if (null === event_id.match(eventIdCheck)) {
+                    throw new Error('Invalid event_id supplied for DesignEvent');
+                }
+
                 this.event_id = event_id;
 
                 if (value !== undefined) {

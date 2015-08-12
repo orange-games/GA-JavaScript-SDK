@@ -4,6 +4,8 @@ module GA
 {
     export module Events
     {
+        var eventIdCheck = /^(Start|Fail|Complete):[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}(:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}){0,2}$/;
+
         export class Progression implements GA.Events.IdEvent
         {
             /**
@@ -31,7 +33,10 @@ module GA
 
             constructor(event_id: string, attempt_num?: number, score?: number)
             {
-                //TODO: validation
+                if (null === event_id.match(eventIdCheck)) {
+                    throw new Error('Invalid event_id supplied for ProgressionEvent');
+                }
+
                 this.event_id = event_id;
 
                 if (attempt_num !== undefined) {

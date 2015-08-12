@@ -4,6 +4,8 @@ module GA
 {
     export module Events
     {
+        var eventIdCheck = /^(Sink|Source):[A-Za-z]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}/;
+
         export class Business implements GA.Events.IdEvent
         {
             /**
@@ -55,14 +57,22 @@ module GA
 
             constructor(event_id: string, amount: number, currency: string, transaction_num: number, cart_type?: string, receipt_info?: {})
             {
-                //TODO: Validation
+                if (null === event_id.match(eventIdCheck)) {
+                    throw new Error('Invalid event_id supplied for BusinessEvent');
+                }
                 this.event_id = event_id;
+
                 this.amount = amount;
+
+                if (null === currency.match(/^[A-Z]{3}$/)) {
+                    throw new Error('Invalid currency supplied for BusinessEvent');
+                }
                 this.currency = currency;
+
                 this.transaction_num = transaction_num;
 
                 if (cart_type !== undefined) {
-                    this.cart_type = cart_type;
+                    this.cart_type = cart_type.substr(0, 32);
                 }
 
                 if (receipt_info !== undefined) {

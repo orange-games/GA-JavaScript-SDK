@@ -21,7 +21,15 @@ module GA
             public message: string = ''
         }
 
-        export function postRequest(url:string, data:string, authHeader:string, callback: (data: Response) => void)
+        /**
+         * Sends some data to a given url
+         *
+         * @param url           The url we would like to POST the data to
+         * @param data          The data that we want to post
+         * @param authHeader    The authentication header that needs to be set in order to make the POST succeed
+         * @param callback      The callback that handles the responses from the server
+         */
+        export function postRequest(url: string, data: string, authHeader: string, callback: (data: Response) => void)
         {
             var xhr;
             if ((<any>window).XMLHttpRequest) {

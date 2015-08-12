@@ -4,6 +4,8 @@ module GA
 {
     export module Events
     {
+        var eventIdCheck = /^(Sink|Source):[A-Za-z]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}/;
+
         export class Resource implements GA.Events.IdEvent
         {
             /**
@@ -25,8 +27,11 @@ module GA
 
             constructor(event_id: string, amount: number)
             {
-                //TODO: validation
+                if (null === event_id.match(eventIdCheck)) {
+                    throw new Error('Invalid event_id supplied for ResourceEvent');
+                }
                 this.event_id = event_id;
+
                 this.amount = amount;
             }
         }

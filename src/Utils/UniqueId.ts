@@ -5,9 +5,7 @@ module GA
     export module Utils
     {
         /**
-         * Copied from:
-         * https://github.com/GameAnalytics/GA-Flash-SDK/blob/master/GameAnalytics/src/com/gameanalytics/utils/GAUniqueIdUtil.as
-         * to be the same as Flash
+         * Creates a UUID that can be used for GameAnalytics
          *
          * @returns {String}
          */

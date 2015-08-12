@@ -10,6 +10,7 @@ declare module GA {
      * GameAnalytics lib
      */
     class GameAnalytics {
+        static SCHEDULE_TIME: number;
         /**
          * Version showing in GameAnalytics, I prefer Javascript 2.x.x but docs state
          * //Custom solutions should ALWAYS use the string “rest api v2”
@@ -17,21 +18,64 @@ declare module GA {
          * @type {string}
          */
         static SDK_VERSION: string;
-        private gameKey;
-        private secretKey;
-        private build;
-        private userId;
-        private sessionId;
-        private apiUrl;
-        private messageQueue;
+        /**
+         * The url for GameAnalytics' API
+         *
+         * @type {string}
+         */
+        static API_URL: string;
+        /**
+         * Stored instance for GameAnalytics
+         *
+         * @type {GameAnalytics}
+         */
         static instance: GameAnalytics;
+        /**
+         * The key of the game, provided by GameAnalytics
+         */
+        private gameKey;
+        /**
+         * The secret to sign the request, provided by GameAnalytics
+         */
+        private secretKey;
+        /**
+         * The build version of the game
+         */
+        private build;
+        /**
+         * The unique ID of the playing user
+         */
+        private userId;
+        /**
+         * The current sesison of the playing user
+         *
+         * @type {string}
+         */
+        private sessionId;
+        /**
+         * Queue of messages for GameAnalytics, will be drained every 15 seconds or when a user calls sendData
+         *
+         * @type {GA.MessageQueue}
+         */
+        private messageQueue;
         /**
          * Used to check if events can be sent to the API, set based on the response of the init request
          *
          * @type {boolean}  events are only sendEvent of true
          */
         private enabled;
+        /**
+         * If the init call has ben processed or not. If not, we reschedule sendData() calls so we make sure data is send
+         *
+         * @type {boolean}
+         */
         private initProcessed;
+        /**
+         * The message queue gets drained every 15 seconds, but we reset this time when sendData() was called manually
+         *
+         * @type {number}
+         */
+        private timeoutId;
         /**
          * An integer timestamp of the current server time in UTC (seconds since EPOCH).
          * This is stored locally along with client timestamp to calculate an offset (if client clock is not configured correctly).
@@ -59,6 +103,12 @@ declare module GA {
          * Send data from the message queue
          */
         sendData(): GameAnalytics;
+        /**
+         * Schedules the next time for a sendData call
+         *
+         * @param time  The time in ms until the next sendData call
+         */
+        private scheduleSendData(time);
         /**
          * Sends a message to GA
          *
@@ -100,7 +150,13 @@ declare module GA {
      * or from a single string
      */
     class Message {
+        /**
+         * The Event we would like to send to GameAnalytics
+         */
         private event;
+        /**
+         * Some default data that needs to be send with any event
+         */
         private annotations;
         constructor(event: Events.Event, annotations: Utils.DefaultAnnotations);
         /**
@@ -114,9 +170,7 @@ declare module GA {
 declare module GA {
     module Utils {
         /**
-         * Copied from:
-         * https://github.com/GameAnalytics/GA-Flash-SDK/blob/master/GameAnalytics/src/com/gameanalytics/utils/GAUniqueIdUtil.as
-         * to be the same as Flash
+         * Creates a UUID that can be used for GameAnalytics
          *
          * @returns {String}
          */
@@ -139,6 +193,14 @@ declare module GA {
              */
             message: string;
         }
+        /**
+         * Sends some data to a given url
+         *
+         * @param url           The url we would like to POST the data to
+         * @param data          The data that we want to post
+         * @param authHeader    The authentication header that needs to be set in order to make the POST succeed
+         * @param callback      The callback that handles the responses from the server
+         */
         function postRequest(url: string, data: string, authHeader: string, callback: (data: Response) => void): void;
     }
 }
@@ -226,7 +288,14 @@ declare module GA {
 }
 declare module GA {
     module Events {
-        class Error implements Event {
+        enum ErrorSeverity {
+            debug = 0,
+            info = 1,
+            warning = 2,
+            error = 3,
+            critical = 4,
+        }
+        class Exception implements Event {
             /**
              * The category of this event, sendEvent to GameAnalytics to identify the event type
              *
@@ -241,7 +310,13 @@ declare module GA {
              * Stack trace or other information detailing the error. Can be an empty string.
              */
             message: string;
-            constructor(severity: string, message?: string);
+            /**
+             * Create a new Error event
+             *
+             * @param severity  Error severity, should be of type ErrorSeverity
+             * @param message   The emssage of the error, we'd like new Error().stack
+             */
+            constructor(severity: ErrorSeverity, message?: string);
         }
     }
 }
