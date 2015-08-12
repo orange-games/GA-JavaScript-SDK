@@ -32,6 +32,7 @@ module.exports = function (grunt) {
                     'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js': [
                         'vendor/hmac-sha256.js',
                         'vendor/enc-base64-min.js',
+                        'vendor/uuid.js',
                         'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js'
                     ]
                 }

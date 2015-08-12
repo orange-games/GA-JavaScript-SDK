@@ -13,18 +13,10 @@ module GA
          */
         export function createUniqueId(): string
         {
-            var chars: string           = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var num_chars: number       = chars.length - 1;
-            var randomString: string    = "";
-
-            for (var i:number = 0; i < 35; i++) {
-                if (i == 8 || i == 13 || i == 18 || i == 23)
-                    randomString += "-";
-                else
-                    randomString += chars.charAt(Math.floor(Math.random() * num_chars));
-            }
-
-            return randomString;
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
         }
     }
 }

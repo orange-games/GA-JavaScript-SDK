@@ -62,14 +62,14 @@ module GA
             var obj: DefaultAnnotations = {
                 sdk_version: GameAnalytics.SDK_VERSION,
                 platform: 'windows',
-                os_version: 'windows',
+                os_version: 'windows 8',
                 device: 'unknown',
                 v: 2,
                 user_id: user_id,
                 client_ts: Date.now(),
                 manufacturer: 'unknown',
                 session_id: session_id,
-                session_num: 0,
+                session_num: 1,
                 build: build
             };
 
