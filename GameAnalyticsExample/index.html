@@ -20,10 +20,11 @@
         var user = Date.now().toString(); //Unique user ID, handy for getting sessions
 
         //Create an instance
-        var GA = GameAnalytics.getInstance();
-
-        //Setup game analytics
-        GA.init(gameKey, secretKey, build, user);
+        GA.getInstance()
+            .init(gameKey, secretKey, build, user)
+            .addEvent(new GA.Events.User())
+            .addEvent(new GA.Events.Design('Game:Start'))
+            .sendData();
     </script>
 
     <!-- Game we want to track -->
@@ -83,8 +84,8 @@
 
                     timeout = setTimeout(self.tick.bind(self), speed);
 
-                    //Here we send a start event without any values
-                    GA.sendEvent(new DesignEvent('Game:Snake:Start'));
+                    //Here we sendEvent a start event without any values
+//                    GA.sendEvent(new DesignEvent('Game:Snake:Start'));
                     placeFood();
                 },
                 reset: function () {
@@ -113,8 +114,8 @@
                         if (body.hasOwnProperty(part) && body[part][0] === vx && body[part][1] === vy) {
                             clearInterval(timeout);
 
-                            //here we send a game end event, including the current score.
-                            GA.sendEvent(new DesignEvent('Game:Snake:End', body.length));
+                            //here we sendEvent a game end event, including the current score.
+//                            GA.sendEvent(new DesignEvent('Game:Snake:End', body.length));
 
                             a = confirm(body.length + ' pts! play again?');
                             if (a) {

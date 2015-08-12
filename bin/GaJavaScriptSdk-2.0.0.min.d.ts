@@ -1,216 +1,422 @@
 /// <reference path="../vendor/cryptojs.d.ts" />
-/**
- * GameAnalytics lib
- */
-declare class GameAnalytics {
-    /**
-     * Version showing in gameanalytics, I prefer Javascript 2.x.x but docs state
-     * //Custom solutions should ALWAYS use the string “rest api v2”
-     *
-     * @type {string}
-     */
-    static SDK_VERSION: string;
-    private gameKey;
-    private secretKey;
-    private build;
-    private userId;
-    private sessionId;
-    private apiUrl;
-    private messageQueue;
-    private static instance;
-    /**
-     * Used to check if events can be sent to the API, set based on the response of the init request
-     *
-     * @type {boolean}  events are only send of true
-     */
-    private enabled;
+declare module GA {
     /**
      * Fetches an created instance
      *
      * @returns {GameAnalytics}
      */
-    static getInstance(): GameAnalytics;
+    function getInstance(): GameAnalytics;
     /**
-     * This initializes the GameAnalytics stuff with some important parameters
-     * GA won't work without!
-     *
-     * @param gameKey       a Game's unique key
-     * @param secretKey     secret key used to auth an message
-     * @param build         The build version of your application
-     * @param userId        The id of the user
+     * GameAnalytics lib
      */
-    init(gameKey: string, secretKey: string, build: string, userId: string): void;
+    class GameAnalytics {
+        /**
+         * Version showing in GameAnalytics, I prefer Javascript 2.x.x but docs state
+         * //Custom solutions should ALWAYS use the string “rest api v2”
+         *
+         * @type {string}
+         */
+        static SDK_VERSION: string;
+        private gameKey;
+        private secretKey;
+        private build;
+        private userId;
+        private sessionId;
+        private apiUrl;
+        private messageQueue;
+        static instance: GameAnalytics;
+        /**
+         * Used to check if events can be sent to the API, set based on the response of the init request
+         *
+         * @type {boolean}  events are only sendEvent of true
+         */
+        private enabled;
+        private initProcessed;
+        /**
+         * An integer timestamp of the current server time in UTC (seconds since EPOCH).
+         * This is stored locally along with client timestamp to calculate an offset (if client clock is not configured correctly).
+         *
+         * @type {number}
+         */
+        private serverTime;
+        /**
+         * This initializes the GameAnalytics stuff with some important parameters
+         * GA won't work without!
+         *
+         * @param gameKey       a Game's unique key
+         * @param secretKey     secret key used to auth an message
+         * @param build         The build version of your application
+         * @param userId        The id of the user
+         */
+        init(gameKey: string, secretKey: string, build: string, userId: string): GameAnalytics;
+        /**
+         * Adds an event to the message queue
+         *
+         * @param event
+         */
+        addEvent(event: Events.Event): GameAnalytics;
+        /**
+         * Send data from the message queue
+         */
+        sendData(): GameAnalytics;
+        /**
+         * Sends a message to GA
+         *
+         * @param databag
+         * @param event
+         * @param responseHandler
+         */
+        private sendEvent(databag, event, responseHandler?);
+    }
+}
+declare module GA {
     /**
-     * Adds an event to the message queue
-     *
-     * @param e
+     * A message queue that stores messages that need to be sendEvent to GA
+     * Saves the queue's to local storage and can be loaded from localStorage
      */
-    addEvent(e: GameAnalyticsEvent): void;
+    class MessageQueue {
+        private queue;
+        /**
+         * Load possible old queue from localStorage
+         */
+        constructor();
+        push(message: Message): void;
+        pop(): Message;
+        length: number;
+        /**
+         * Save the queue in localStorage
+         */
+        private save();
+        /**
+         * Load the queue from localStorage
+         */
+        private load();
+    }
+}
+declare module GA {
     /**
-     * Combination of addEvent and sendData in one go
-     * Sends events immediatly
-     *
-     * @param e
+     * Message
+     * It's a wrapper for an event that can be sendEvent to GA. It can be constructed normally
+     * or from a single string
      */
-    sendEvent(e: GameAnalyticsEvent): void;
-    /**
-     * Send data from the message queue
-     */
-    sendData(): void;
-    /**
-     * Sends a message to GA
-     *
-     * @param databag
-     * @param event
-     * @param responseHandler
-     */
-    private send(databag, event, responseHandler?);
+    class Message {
+        private event;
+        private annotations;
+        constructor(event: Events.Event, annotations: Utils.DefaultAnnotations);
+        /**
+         * Returns the data that should be sendEvent over the wire
+         *
+         * @returns {{eventId: string, value: number, area: string, x: number, y: number, z: number, userId: string, sessionId: string, build: string}}
+         */
+        data: Object;
+    }
 }
-/**
- * A message queue that stores messages that need to be send to GA
- * Saves the queue's to local storage and can be loaded from localStorage
- */
-declare class MessageQueue {
-    private designQueue;
-    private businessQueue;
-    private errorQueue;
-    private userQueue;
-    /**
-     * Load possible old queue from localStorage
-     */
-    constructor();
-    push(m: Message): void;
-    pop(event: string): Message;
-    length(event: string): number;
-    private getQueue(event);
-    /**
-     * Load the queue from localStorage
-     */
-    private load();
-    /**
-     * Save the queue to local storage
-     */
-    private save(event);
+declare module GA {
+    module Utils {
+        /**
+         * Copied from:
+         * https://github.com/GameAnalytics/GA-Flash-SDK/blob/master/GameAnalytics/src/com/gameanalytics/utils/GAUniqueIdUtil.as
+         * to be the same as Flash
+         *
+         * @returns {String}
+         */
+        function createUniqueId(): string;
+    }
 }
-/**
- * Message
- * It's a wrapper for an event that can be send to GA. It can be constructed normally
- * or from a single string
- */
-declare class Message {
-    private e;
-    private build;
-    private sessionId;
-    private userId;
-    constructor(e: GameAnalyticsEvent, userId: string, sessionId: string, build: string);
-    /**
-     * Load a Message from string, needed for localStorage recovery
-     *
-     * @param event
-     * @param data
-     * @returns {*}
-     */
-    static fromString(event: string, data: string): Message;
-    /**
-     * Returns the data that should be send over the wire
-     *
-     * @returns {{eventId: string, value: number, area: string, x: number, y: number, z: number, userId: string, sessionId: string, build: string}}
-     */
-    data: Object;
-    /**
-     * Returns the event category to where we want to post the event
-     *
-     * @returns {string}
-     */
-    event: string;
+declare module GA {
+    module Utils {
+        class Response {
+            /**
+             * The response state, if the call was successful or not
+             *
+             * @type {boolean}
+             */
+            success: boolean;
+            /**
+             * The response of the server
+             *
+             * @type {string}
+             */
+            message: string;
+        }
+        function postRequest(url: string, data: string, authHeader: string, callback: (data: Response) => void): void;
+    }
 }
-declare class GAUniqueidUtil {
-    /**
-     * Copied from:
-     * https://github.com/GameAnalytics/GA-Flash-SDK/blob/master/GameAnalytics/src/com/gameanalytics/utils/GAUniqueIdUtil.as
-     * to be the same as Flash
-     *
-     * @returns {String}
-     */
-    static createUniqueId(): string;
+declare module GA {
+    module Utils {
+        interface BaseAnnotations {
+            /**
+             * Custom solutions should ALWAYS use the string “rest api v2”
+             */
+            sdk_version: string;
+            /**
+             * A string representing the OS version, e.g. “ios 8.1”
+             */
+            platform: string;
+            /**
+             * A string representing the platform of the SDK, e.g. “ios”
+             */
+            os_version: string;
+        }
+        interface DefaultAnnotations extends BaseAnnotations {
+            device: string;
+            v: number;
+            user_id: string;
+            client_ts: number;
+            manufacturer: string;
+            session_id: string;
+            session_num: number;
+            googleplus_id?: string;
+            facebook_id?: string;
+            gender?: string;
+            birth_year?: number;
+            custom_01?: string;
+            custom_02?: string;
+            custom_03?: string;
+            build?: string;
+            engine_version?: string;
+            connection_type?: string;
+            progression?: string;
+            ios_idfv?: string;
+            ios_idfa?: string;
+            google_aid?: string;
+            limit_ad_tracking?: boolean;
+            logon_gamecenter?: boolean;
+            logon_googleplay?: boolean;
+            jailbroken?: boolean;
+            android_id?: string;
+        }
+        function getDefaultAnnotations(user_id: string, session_id: string, build: string): DefaultAnnotations;
+        function getBaseAnnotations(): BaseAnnotations;
+    }
 }
-declare class GARequest {
-    static post(url: string, data: string, authHeader: string, callback: Function): void;
+declare module GA {
+    module Events {
+        enum Category {
+            design = 0,
+            business = 1,
+            error = 2,
+            user = 3,
+            session_end = 4,
+            progression = 5,
+            resource = 6,
+        }
+    }
 }
-interface DeviceObject {
-    sdk_version: string;
-    platform: string;
-    os_version: string;
+declare module GA {
+    module Events {
+        class Design implements IdEvent {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * A 1-5 part event id.
+             */
+            event_id: string;
+            /**
+             * Optional value.
+             */
+            value: number;
+            constructor(event_id: string, value?: number);
+        }
+    }
 }
-declare class GADeviceUtil {
-    constructor();
-    static createUserEventDeviceObject(sdkVersion: String): any;
-    static createInitEventDeviceObject(sdkVersion: string): DeviceObject;
+declare module GA {
+    module Events {
+        class Error implements Event {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * The type of error severity.
+             */
+            severity: string;
+            /**
+             * Stack trace or other information detailing the error. Can be an empty string.
+             */
+            message: string;
+            constructor(severity: string, message?: string);
+        }
+    }
 }
-/**
- * Generic event, all event types inherit from this
- */
-declare class GameAnalyticsEvent {
-    static DESIGN_EVENT: string;
-    static BUSINESS_EVENT: string;
-    static ERROR_EVENT: string;
-    static USER_EVENT: string;
-    static INIT_EVENT: string;
-    event: string;
-    constructor(event: string);
-    getData(): any;
+declare module GA {
+    module Events {
+        interface Response {
+        }
+        interface Event {
+            category: Category;
+        }
+        interface IdEvent extends Event {
+            event_id: string;
+        }
+    }
 }
-interface IGameAnalyticsEvent {
-    event: string;
-    toString(): string;
+declare module GA {
+    module Events {
+        /**
+         * The response object for an Init event. This tells us if we're allowed to do future requests
+         */
+        class InitResponse implements Response {
+            /**
+             * Events should ONLY be sent if this field is present and set to true. If not true then deactivate.
+             */
+            enabled: boolean;
+            /**
+             * An integer timestamp of the current server time in UTC (seconds since EPOCH).
+             */
+            severs_ts: number;
+            /**
+             * An array of strings. Not used at the moment. In the future this could contain flags set by GA servers to control SDK behaviour.
+             */
+            flags: string[];
+        }
+        /**
+         * Init event, should be called when a new session starts
+         */
+        class Init {
+            data: Utils.BaseAnnotations;
+            constructor(data: Utils.BaseAnnotations);
+            toString(): string;
+        }
+    }
 }
-/**
- * Generic event, all event types inherit from this
- */
-declare class GeneralEvent extends GameAnalyticsEvent {
-    eventId: string;
-    value: number;
-    area: string;
-    x: number;
-    y: number;
-    z: number;
-    constructor(event: string, eventId?: string, value?: number, area?: string, x?: number, y?: number, z?: number);
-    getData(): any;
+declare module GA {
+    module Events {
+        class Progression implements IdEvent {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * A 2-4 part event id. Status:Progression1:Progression2:Progression3
+             */
+            event_id: string;
+            /**
+             * The attempts performed on this level. Send only when Status is “Complete”.
+             * Similar to the session_num. Incremented each time a progression attempt is started for this speficic event_id.
+             */
+            attempt_num: number;
+            /**
+             * An optional player score for attempt. Only sent when Status is “Fail” or “Complete”.
+             */
+            score: number;
+            constructor(event_id: string, attempt_num?: number, score?: number);
+        }
+    }
 }
-/**
- * Design event
- * use this to do regular gameplay shizzle
- */
-declare class DesignEvent extends GeneralEvent {
-    constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
+declare module GA {
+    module Events {
+        class Resource implements IdEvent {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * A 4 part event id. FlowType:InGameCurrency:ItemType:ItemId
+             */
+            event_id: string;
+            /**
+             * The amount of the in game currency (float)
+             */
+            amount: number;
+            constructor(event_id: string, amount: number);
+        }
+    }
 }
-/**
- * Error event
- * Used this to send any errors to GA
- */
-declare class GaErrorEvent extends GeneralEvent {
-    constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
+declare module GA {
+    module Events {
+        /**
+         * The session_end event should always be sent whenever a session is determined to be over.
+         * For example whenever a mobile device is ‘going-to-background’ or when a user quit your game in other ways.
+         * Only one session_end event per session should be generated/sent.
+         */
+        class SessionEnd implements Event {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * The length of the session in seconds
+             *
+             * @type {number}
+             */
+            length: number;
+            constructor(lenth: number);
+        }
+    }
 }
-/**
- * Business event
- */
-declare class UserEvent extends GameAnalyticsEvent {
-    private userData;
-    constructor(userData: any);
-    getData(): any;
+declare module GA {
+    module Events {
+        /**
+         * The user event acts like a session start.
+         * It should always be the first event in the first batch sent to the collectors and added each time a session starts.
+         */
+        class User implements Event {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+        }
+    }
 }
-/**
- * Business event
- */
-declare class BusinessEvent extends GeneralEvent {
-    constructor(eventId: string, value?: number, area?: string, x?: number, y?: number, z?: number);
-}
-/**
- * Init event, should be called when a new session starts
- */
-declare class InitEvent implements IGameAnalyticsEvent {
-    event: string;
-    data: DeviceObject;
-    constructor(data: DeviceObject);
-    toString(): string;
+declare module GA {
+    module Events {
+        class Business implements IdEvent {
+            /**
+             * The category of this event, sendEvent to GameAnalytics to identify the event type
+             *
+             * @type {GA.Events.Category}
+             */
+            category: Category;
+            /**
+             * A 2 part event id; ItemType:ItemId
+             */
+            event_id: string;
+            /**
+             * The amount of the purchase in cents (integer)
+             */
+            amount: number;
+            /**
+             * Currency need to be a 3 letter upper case string to pass validation.
+             * In addition the currency need to be a valid currency for correct rate/conversion calculation at a later stage.
+             * Look at the following link for a list valid currency values.
+             *
+             * http://openexchangerates.org/currencies.json.
+             */
+            currency: string;
+            /**
+             * Similar to the session_num. Store this value locally and increment each time a business event is submitted during the lifetime (installation) of the game/app.
+             * @type {number}
+             */
+            transaction_num: number;
+            /**
+             * A string representing the cart (the location) from which the purchase was made.
+             * Could be menu_shop or end_of_level_shop.
+             */
+            cart_type: string;
+            /**
+             * A JSON object that can contain 3 fields: store, receipt and signature. Used for payment validation of receipts.
+             * Currently purchase validation is only supported for iOS and Android stores.
+             *
+             * For iOS the store is apple and the receipt is base64 encoded.
+             * For Android the store is google_play and the receipt is base64 encoded + the IAP signature is also required.
+             */
+            receipt_info: {};
+            constructor(event_id: string, amount: number, currency: string, transaction_num: number, cart_type?: string, receipt_info?: {});
+        }
+    }
 }
