@@ -37,6 +37,9 @@
     "phantomjs": "1.9.7-15",
     "mocha-phantomjs": "^3.6.0"
   },
+  "scripts": {
+    "test": "./node_modules/mocha-phantomjs/bin/mocha-phantomjs ./tests/index.html"
+  },
   "engines": {
     "node": "2.5.0"
   }
