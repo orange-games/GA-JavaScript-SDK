@@ -57,7 +57,7 @@ module GA
             android_id?:            string;
         }
 
-        export function getDefaultAnnotations(user_id: string, session_id: string, build: string): DefaultAnnotations
+        export function getDefaultAnnotations(user: User, session_id: string, build: string): DefaultAnnotations
         {
             var obj: DefaultAnnotations = {
                 sdk_version: GameAnalytics.SDK_VERSION,
@@ -65,13 +65,25 @@ module GA
                 os_version: 'windows 8',
                 device: 'unknown',
                 v: 2,
-                user_id: user_id,
+                user_id: user.user_id,
                 client_ts: Date.now(),
                 manufacturer: 'unknown',
                 session_id: session_id,
                 session_num: 1,
                 build: build
             };
+
+            if (user.facebook_id) {
+                obj.facebook_id = user.facebook_id;
+            }
+
+            if (user.gender === Gender.male || user.gender === Gender.female) {
+                obj.gender = Gender[user.gender];
+            }
+
+            if (user.birth_year) {
+                obj.birth_year = user.birth_year;
+            }
 
             var ua:string = navigator.userAgent;
 

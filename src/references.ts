@@ -1,9 +1,10 @@
 /// <reference path="../vendor/cryptojs.d.ts" />
 
 /// <reference path="GameAnalytics.ts" />
-/// <reference path="MessageQueue.ts" />
-/// <reference path="Message.ts" />
+/// <reference path="User.ts" />
 
+/// <reference path="Utils/MessageQueue.ts" />
+/// <reference path="Utils/Message.ts" />
 /// <reference path="Utils/UniqueId.ts" />
 /// <reference path="Utils/PostRequest.ts" />
 /// <reference path="Utils/Annotations.ts" />

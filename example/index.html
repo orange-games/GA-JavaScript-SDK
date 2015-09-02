@@ -17,7 +17,8 @@
         var secretKey = "16813a12f718bc5c620f56944e1abc3ea13ccbac";
 
         var build = "2.0"; //The current version of your game, it's wise to bump this with every analytics/game change
-        var user = Date.now().toString(); //Unique user ID, handy for getting sessions
+
+        var user = new GA.User(Date.now().toString(), undefined, GA.Gender.male, 1970);
 
         //Create an instance
         GA.getInstance()

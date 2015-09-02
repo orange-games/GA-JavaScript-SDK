@@ -43,9 +43,9 @@ declare module GA {
          */
         private build;
         /**
-         * The unique ID of the playing user
+         * The user
          */
-        private userId;
+        private user;
         /**
          * The current sesison of the playing user
          *
@@ -92,7 +92,7 @@ declare module GA {
          * @param build         The build version of your application
          * @param userId        The id of the user
          */
-        init(gameKey: string, secretKey: string, build: string, userId: string): GameAnalytics;
+        init(gameKey: string, secretKey: string, build: string, user: User): GameAnalytics;
         /**
          * Adds an event to the message queue
          *
@@ -120,51 +120,68 @@ declare module GA {
     }
 }
 declare module GA {
-    /**
-     * A message queue that stores messages that need to be sendEvent to GA
-     * Saves the queue's to local storage and can be loaded from localStorage
-     */
-    class MessageQueue {
-        private queue;
-        /**
-         * Load possible old queue from localStorage
-         */
-        constructor();
-        push(message: Message): void;
-        pop(): Message;
-        length: number;
-        /**
-         * Save the queue in localStorage
-         */
-        private save();
-        /**
-         * Load the queue from localStorage
-         */
-        private load();
+    enum Gender {
+        male = 0,
+        female = 1,
+    }
+    class User {
+        user_id: string;
+        facebook_id: string;
+        gender: Gender;
+        birth_year: number;
+        constructor(user_id: string, facebook_id?: string, gender?: Gender, birth_year?: number);
     }
 }
 declare module GA {
-    /**
-     * Message
-     * It's a wrapper for an event that can be sendEvent to GA. It can be constructed normally
-     * or from a single string
-     */
-    class Message {
+    module Utils {
         /**
-         * The Event we would like to send to GameAnalytics
+         * A message queue that stores messages that need to be sendEvent to GA
+         * Saves the queue's to local storage and can be loaded from localStorage
          */
-        private event;
+        class MessageQueue {
+            private queue;
+            /**
+             * Load possible old queue from localStorage
+             */
+            constructor();
+            push(message: Message): void;
+            pop(): Message;
+            length: number;
+            /**
+             * Save the queue in localStorage
+             */
+            private save();
+            /**
+             * Load the queue from localStorage
+             */
+            private load();
+        }
+    }
+}
+declare module GA {
+    module Utils {
         /**
-         * Some default data that needs to be send with any event
+         * Message
+         * It's a wrapper for an event that can be sendEvent to GA. It can be constructed normally
+         * or from a single string
          */
-        private annotations;
-        constructor(event: Events.Event, annotations: Utils.DefaultAnnotations);
-        /**
-         * Returns the data that should be sendEvent over the wire
-         *
-         * @returns {{eventId: string, value: number, area: string, x: number, y: number, z: number, userId: string, sessionId: string, build: string}}
-         */
-        data: Object;
+        class Message {
+            /**
+             * The Event we would like to send to GameAnalytics
+             */
+            private event;
+            /**
+             * Some default data that needs to be send with any event
+             */
+            private annotations;
+            constructor(event: Events.Event, annotations: DefaultAnnotations);
+            /**
+             * Returns the data that should be sendEvent over the wire
+             *
+             * @returns {{eventId: string, value: number, area: string, x: number, y: number, z: number, userId: string, sessionId: string, build: string}}
+             */
+            data: Object;
+        }
     }
 }
 declare module GA {
@@ -248,7 +265,7 @@ declare module GA {
             jailbroken?: boolean;
             android_id?: string;
         }
-        function getDefaultAnnotations(user_id: string, session_id: string, build: string): DefaultAnnotations;
+        function getDefaultAnnotations(user: User, session_id: string, build: string): DefaultAnnotations;
         function getBaseAnnotations(): BaseAnnotations;
     }
 }

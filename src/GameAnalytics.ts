@@ -62,9 +62,9 @@ module GA
         private build: string;
 
         /**
-         * The unique ID of the playing user
+         * The user
          */
-        private userId: string;
+        private user: User;
 
         /**
          * The current sesison of the playing user
@@ -78,7 +78,7 @@ module GA
          *
          * @type {GA.MessageQueue}
          */
-        private messageQueue: MessageQueue = new MessageQueue();
+        private messageQueue: Utils.MessageQueue = new Utils.MessageQueue();
 
         /**
          * Used to check if events can be sent to the API, set based on the response of the init request
@@ -118,7 +118,7 @@ module GA
          * @param build         The build version of your application
          * @param userId        The id of the user
          */
-        public init(gameKey: string, secretKey: string, build: string, userId: string): GameAnalytics
+        public init(gameKey: string, secretKey: string, build: string, user: User): GameAnalytics
         {
             if (null === GameAnalytics.instance) {
                 throw new Error('No instance available!');
@@ -127,7 +127,7 @@ module GA
             this.gameKey = gameKey;
             this.secretKey = secretKey;
             this.build = build;
-            this.userId = userId;
+            this.user = user;
 
             var initEvent = new Events.Init(Utils.getBaseAnnotations());
             this.sendEvent(initEvent.toString(), 'init', (response: GA.Events.InitResponse) => {
@@ -159,7 +159,7 @@ module GA
                 throw new Error('No instance available!');
             }
 
-            var m = new Message(event, Utils.getDefaultAnnotations(this.userId, this.sessionId, this.build));
+            var m = new Utils.Message(event, Utils.getDefaultAnnotations(this.user, this.sessionId, this.build));
             this.messageQueue.push(m);
 
             return this;

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>GameAnalytics Javascript SDK tests</title>
+        <link rel="stylesheet" media="all" href="../node_modules/mocha/mocha.css">
+    </head>
+    <body>
+        <div id="mocha"><p><a href=".">Index</a></p></div>
+        <div id="messages"></div>
+        <div id="fixtures"></div>
+
+        <script src="../vendor/enc-base64-min.js"></script>
+        <script src="../vendor/hmac-sha256.js"></script>
+
+        <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/chai/chai.js"></script>
+
+        <script src="../bin/GaJavaScriptSdk.js"></script>
+
+        <script>mocha.setup('bdd')</script>
+        <script src="test.js"></script>
+        <script>mochaPhantomJS.run();</script>
+    </body>
+</html>
