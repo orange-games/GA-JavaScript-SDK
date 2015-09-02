@@ -13,5 +13,16 @@ module GA
         {
             event_id: string;
         }
+
+        export enum Category
+        {
+            design,
+            business,
+            error,
+            user,
+            session_end,
+            progression,
+            resource
+        }
     }
 }

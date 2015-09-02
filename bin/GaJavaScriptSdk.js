@@ -221,14 +221,16 @@ var GA;
     var User = (function () {
         function User(user_id, facebook_id, gender, birth_year) {
             this.user_id = '';
-            this.user_id = user_id;
+            if (user_id) {
+                this.user_id = user_id;
+            }
             if (facebook_id && facebook_id.length > 0) {
                 this.facebook_id = facebook_id;
             }
             if (gender === 1 /* female */ || gender === 0 /* male */) {
                 this.gender = gender;
             }
-            if (birth_year.toString().match(/^[0-9]{4}$/gi)) {
+            if (birth_year && birth_year.toString().match(/^[0-9]{4}$/gi)) {
                 this.birth_year = birth_year;
             }
         }
@@ -502,22 +504,6 @@ var GA;
         Utils.getBaseAnnotations = getBaseAnnotations;
     })(Utils = GA.Utils || (GA.Utils = {}));
 })(GA || (GA = {}));
-var GA;
-(function (GA) {
-    var Events;
-    (function (Events) {
-        (function (Category) {
-            Category[Category["design"] = 0] = "design";
-            Category[Category["business"] = 1] = "business";
-            Category[Category["error"] = 2] = "error";
-            Category[Category["user"] = 3] = "user";
-            Category[Category["session_end"] = 4] = "session_end";
-            Category[Category["progression"] = 5] = "progression";
-            Category[Category["resource"] = 6] = "resource";
-        })(Events.Category || (Events.Category = {}));
-        var Category = Events.Category;
-    })(Events = GA.Events || (GA.Events = {}));
-})(GA || (GA = {}));
 /// <reference path="../references.ts" />
 var GA;
 (function (GA) {
@@ -585,6 +571,22 @@ var GA;
             return Exception;
         })();
         Events.Exception = Exception;
+    })(Events = GA.Events || (GA.Events = {}));
+})(GA || (GA = {}));
+var GA;
+(function (GA) {
+    var Events;
+    (function (Events) {
+        (function (Category) {
+            Category[Category["design"] = 0] = "design";
+            Category[Category["business"] = 1] = "business";
+            Category[Category["error"] = 2] = "error";
+            Category[Category["user"] = 3] = "user";
+            Category[Category["session_end"] = 4] = "session_end";
+            Category[Category["progression"] = 5] = "progression";
+            Category[Category["resource"] = 6] = "resource";
+        })(Events.Category || (Events.Category = {}));
+        var Category = Events.Category;
     })(Events = GA.Events || (GA.Events = {}));
 })(GA || (GA = {}));
 /// <reference path="../references.ts" />

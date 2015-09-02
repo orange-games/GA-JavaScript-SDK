@@ -12,7 +12,7 @@ module GA
             /**
              * The Event we would like to send to GameAnalytics
              */
-            private event:Events.Event;
+            private event: Events.Event;
 
             /**
              * Some default data that needs to be send with any event

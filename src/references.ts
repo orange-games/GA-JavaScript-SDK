@@ -10,7 +10,6 @@
 /// <reference path="Utils/Annotations.ts" />
 
 /// <reference path="Events/Business.ts" />
-/// <reference path="Events/Category.ts" />
 /// <reference path="Events/Design.ts" />
 /// <reference path="Events/Exception.ts" />
 /// <reference path="Events/Event.ts" />

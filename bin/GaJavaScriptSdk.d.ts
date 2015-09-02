@@ -271,19 +271,6 @@ declare module GA {
 }
 declare module GA {
     module Events {
-        enum Category {
-            design = 0,
-            business = 1,
-            error = 2,
-            user = 3,
-            session_end = 4,
-            progression = 5,
-            resource = 6,
-        }
-    }
-}
-declare module GA {
-    module Events {
         class Design implements IdEvent {
             /**
              * The category of this event, sendEvent to GameAnalytics to identify the event type
@@ -346,6 +333,15 @@ declare module GA {
         }
         interface IdEvent extends Event {
             event_id: string;
+        }
+        enum Category {
+            design = 0,
+            business = 1,
+            error = 2,
+            user = 3,
+            session_end = 4,
+            progression = 5,
+            resource = 6,
         }
     }
 }
