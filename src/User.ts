@@ -24,7 +24,11 @@ module GA
             }
 
             if (facebook_id && facebook_id.length > 0) {
-                this.facebook_id = facebook_id
+                this.facebook_id = facebook_id;
+
+                //https://github.com/GameAnalytics/GA-SDK-UNREAL/wiki/Set-Facebook-Id
+                //User Id must be set to the player's Facebook Id.
+                this.user_id = facebook_id;
             }
 
             if (gender === Gender.female || gender === Gender.male) {
