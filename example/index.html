@@ -4,7 +4,7 @@
     <title>GameAnalytics for Javascript example</title>
 
     <!-- Game Analytics inclusion -->
-    <script type="text/javascript" src="../bin/GaJavaScriptSdk-2.0.0.min.js"></script>
+    <script type="text/javascript" src="../dist/GaJavaScriptSdk-2.0.0.min.js"></script>
 
     <!-- Let's setup gameanalytics -->
     <script type="text/javascript">
@@ -24,9 +24,7 @@
         GA.getInstance()
             .init(gameKey, secretKey, build, user)
             .addEvent(new GA.Events.User())
-            .addEvent(new GA.Events.Design('Game:Start'))
-            .sendData();
-        //TODO show progression/currency events
+            .addEvent(new GA.Events.Design('Game:Start'));
     </script>
 
     <!-- Game we want to track -->

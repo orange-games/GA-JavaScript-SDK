@@ -1,4 +1,6 @@
-# GA-JavaScript-SDK
+GA-JavaScript-SDK [![Build Status](https://travis-ci.org/gembly/GA-JavaScript-SDK.svg?branch=v2)](https://travis-ci.org/gembly/GA-JavaScript-SDK)
+=================
+
 GameAnalytics Javascript SDK
 
 Changelog

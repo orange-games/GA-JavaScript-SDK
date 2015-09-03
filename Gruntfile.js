@@ -18,7 +18,7 @@ module.exports = function (grunt) {
                     banner: '<%= banner %>'
                 },
                 files: {
-                    src: [ 'bin/*.js' ]
+                    src: [ 'dist/*.js' ]
                 }
             }
         },
@@ -27,7 +27,7 @@ module.exports = function (grunt) {
                 src: [
                     'src/**/*.ts'
                 ],
-                dest: 'bin/GaJavaScriptSdk.js',
+                dest: 'dist/GaJavaScriptSdk.js',
                 options: {
                     module: 'amd',
                     target: 'es5',
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
             }
         },
         clean: {
-            build: ["bin"]
+            build: ["dist"]
         },
         uglify: {
             options: {
@@ -48,10 +48,10 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    'bin/GaJavaScriptSdk-<%= pkg.version %>.min.js': [
+                    'bin/GaJavaScriptSdk.min.js': [
                         'vendor/hmac-sha256.js',
                         'vendor/enc-base64-min.js',
-                        'bin/GaJavaScriptSdk.js'
+                        'dist/GaJavaScriptSdk.js'
                     ]
                 }
             }

@@ -7,6 +7,10 @@ describe("GA", function () {
         expect(GA.getInstance()).to.be.instanceof(GA.GameAnalytics);
     });
 
+    describe("GameAnalytics", function () {
+
+    });
+
     describe("User", function () {
         it("should always set the user_id", function () {
                 var userId = 'mycustomid';
@@ -90,7 +94,6 @@ describe("GA", function () {
 
                     this.requests = [];
                     this.xhr.onCreate = function(xhr) {
-                        console.log(xhr);
                         this.requests.push(xhr);
                     }.bind(this);
                 });

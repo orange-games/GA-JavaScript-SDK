@@ -1,3 +1,12 @@
+/*!
+ * GA-JavaScript-SDK - version 2.0.0 
+ * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
+ *
+ * Gembly BV
+ * Build at 02-09-2015
+ * Released under GNUv3 License 
+ */
+
 /// <reference path="references.ts" />
 var GA;
 (function (GA) {
