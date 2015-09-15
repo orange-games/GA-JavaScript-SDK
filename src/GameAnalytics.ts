@@ -1,154 +1,270 @@
 /// <reference path="references.ts" />
 
-/**
- * GameAnalytics lib
- */
-class GameAnalytics
+module GA
 {
-    public static SDK_VERSION:string = 'Javascript 1.1.0';
-
-    private gameKey: string;
-    private secretKey: string;
-    private build: string;
-    private userId: string;
-    private sessionId: string = GAUniqueidUtil.createUniqueId();
-
-    private apiUrl:string = window.location.protocol + '//api.gameanalytics.com/1/';
-    private messageQueue:MessageQueue = new MessageQueue()
-
-    private static instance:GameAnalytics = null;
-
     /**
      * Fetches an created instance
      *
      * @returns {GameAnalytics}
      */
-    public static getInstance() {
+    export function getInstance(): GameAnalytics
+    {
         if (null === GameAnalytics.instance) {
             GameAnalytics.instance = new GameAnalytics();
         }
         return GameAnalytics.instance;
     }
 
-    /**
-     * This initializes the GameAnalytics stuff with some important parameters
-     * GA won't work without!
-     *
-     * @param gameKey       a Game's unique key
-     * @param secretKey     secret key used to auth an message
-     * @param build         The build version of your application
-     * @param userId        The id of the user
-     */
-    public init(gameKey: string, secretKey: string, build: string, userId: string)
-    {
-        if (null === GameAnalytics.instance) {
-            throw new Error('No instance available!');
-        }
-
-        this.gameKey = gameKey;
-        this.secretKey = secretKey;
-        this.build = build;
-        this.userId = userId;
-
-        this.sendEvent(new UserEvent(GADeviceUtil.createUserEventDeviceObject(GameAnalytics.SDK_VERSION)));
-    }
 
     /**
-     * Adds an event to the message queue
-     *
-     * @param e
+     * GameAnalytics lib
      */
-    public addEvent(e:GameAnalyticsEvent)
+    export class GameAnalytics
     {
-        if (null === GameAnalytics.instance) {
-            throw new Error('No instance available!');
+        public static SCHEDULE_TIME: number = 15000;
+
+        /**
+         * Version showing in GameAnalytics, I prefer Javascript 2.x.x but docs state
+         * //Custom solutions should ALWAYS use the string “rest api v2”
+         *
+         * @type {string}
+         */
+        //public static SDK_VERSION:string = 'Javascript 2.0.0';
+        public static SDK_VERSION: string = 'rest api v2';
+
+        /**
+         * The url for GameAnalytics' API
+         *
+         * @type {string}
+         */
+        public static API_URL: string = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
+
+        /**
+         * Stored instance for GameAnalytics
+         *
+         * @type {GameAnalytics}
+         */
+        public static instance: GameAnalytics = null;
+
+        /**
+         * The key of the game, provided by GameAnalytics
+         */
+        private gameKey: string;
+
+        /**
+         * The secret to sign the request, provided by GameAnalytics
+         */
+        private secretKey: string;
+
+        /**
+         * The build version of the game
+         */
+        private build: string;
+
+        /**
+         * The user
+         */
+        private user: User;
+
+        /**
+         * The current sesison of the playing user
+         *
+         * @type {string}
+         */
+        private sessionId: string = Utils.createUniqueId();
+
+        /**
+         * Queue of messages for GameAnalytics, will be drained every 15 seconds or when a user calls sendData
+         *
+         * @type {GA.MessageQueue}
+         */
+        private messageQueue: Utils.MessageQueue = new Utils.MessageQueue();
+
+        /**
+         * Used to check if events can be sent to the API, set based on the response of the init request
+         *
+         * @type {boolean}  events are only sendEvent of true
+         */
+        private enabled: boolean = false;
+
+        /**
+         * If the init call has ben processed or not. If not, we reschedule sendData() calls so we make sure data is send
+         *
+         * @type {boolean}
+         */
+        private initProcessed: boolean = false;
+
+        /**
+         * The message queue gets drained every 15 seconds, but we reset this time when sendData() was called manually
+         *
+         * @type {number}
+         */
+        private timeoutId: number = 0;
+
+        /**
+         * An integer timestamp of the current server time in UTC (seconds since EPOCH).
+         * This is stored locally along with client timestamp to calculate an offset (if client clock is not configured correctly).
+         *
+         * @type {number}
+         */
+        private serverTime: number = 0;
+
+        /**
+         * This initializes the GameAnalytics stuff with some important parameters
+         * GA won't work without!
+         *
+         * @param gameKey       a Game's unique key
+         * @param secretKey     secret key used to auth an message
+         * @param build         The build version of your application
+         * @param userId        The id of the user
+         */
+        public init(gameKey: string, secretKey: string, build: string, user: User): GameAnalytics
+        {
+            if (null === GameAnalytics.instance) {
+                throw new Error('No instance available!');
+            }
+
+            this.gameKey = gameKey;
+            this.secretKey = secretKey;
+            this.build = build;
+            this.user = user;
+
+            var initEvent = new Events.Init(Utils.getBaseAnnotations());
+            this.sendEvent(initEvent.toString(), 'init', (response: GA.Events.InitResponse) => {
+                this.initProcessed = true;
+                if (response.enabled === true) {
+                    this.enabled = true;
+                }
+            });
+
+            //Start the interval. The queue should be emptied every 15 seconds
+            this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
+
+            //Also make sure the queue is empty before we leave the page
+            window.addEventListener('beforeunload', () => {
+               this.sendData();
+            });
+
+            return this;
         }
 
-        var m = new Message(e, this.userId, this.sessionId, this.build);
-        this.messageQueue.push(m);
-    }
+        /**
+         * Adds an event to the message queue
+         *
+         * @param event
+         */
+        public addEvent(event: Events.Event): GameAnalytics
+        {
+            if (null === GameAnalytics.instance) {
+                throw new Error('No instance available!');
+            }
 
-    /**
-     * Combination of addEvent and sendData in one go
-     * Sends events immediatly
-     *
-     * @param e
-     */
-    public sendEvent(e:GameAnalyticsEvent)
-    {
-        if (null === GameAnalytics.instance) {
-            throw new Error('No instance available!');
-        }
-        var m = new Message(e, this.userId, this.sessionId, this.build);
-        var d:string = '';
+            var m = new Utils.Message(event, Utils.getDefaultAnnotations(this.user, this.sessionId, this.build));
+            this.messageQueue.push(m);
 
-        try {
-            d = JSON.stringify(m.data)
-        }
-        catch (e) {}
-        this.send(d, m.event);
-    }
-
-    /**
-     * Send data from the message queue
-     */
-    public sendData()
-    {
-        if (null === GameAnalytics.instance) {
-            throw new Error('No instance available!');
+            return this;
         }
 
-        [GameAnalyticsEvent.BUSINESS_EVENT, GameAnalyticsEvent.DESIGN_EVENT, GameAnalyticsEvent.ERROR_EVENT]. forEach((event) => {
+        /**
+         * Send data from the message queue
+         */
+        public sendData(): GameAnalytics
+        {
+            if (this.initProcessed === false) {
+                //Init not yet processed, try again in 1 second
+                this.scheduleSendData(1000);
+                return this;
+            }
+
+            if (this.enabled === false) {
+                return this;
+            }
+
+            if (null === GameAnalytics.instance) {
+                throw new Error('No instance available!');
+            }
+
             var data:Array<Object> = [];
             var d:string = '';
 
-            while (this.messageQueue.length(event) > 0) {
-                var m = this.messageQueue.pop(event);
+            while (this.messageQueue.length > 0) {
+                var m = this.messageQueue.pop();
                 data.push(m.data);
             }
 
+
             if (0 === data.length) {
-                return;
+                this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
+                return this;
             }
 
             try {
                 d = JSON.stringify(data);
             } catch (e) {}
 
-            this.send(d, event);
-        });
-    }
+            this.sendEvent(d, 'events');
 
-    /**
-     * Sends a message to GA
-     *
-     * @param m
-     */
-    private send(databag:string, event:string)
-    {
-        if (null === GameAnalytics.instance && null === this.gameKey) {
-            throw new Error('No instance available!');
+            //Reschedule this method
+            this.scheduleSendData(GameAnalytics.SCHEDULE_TIME);
+            return this;
         }
 
-        if (databag.length < 1) {
-            return;
+        /**
+         * Schedules the next time for a sendData call
+         *
+         * @param time  The time in ms until the next sendData call
+         */
+        private scheduleSendData(time: number): void
+        {
+            //Reschedule this method
+            clearTimeout(this.timeoutId);
+            this.timeoutId = setTimeout(() => {
+                this.sendData();
+            }, time);
         }
 
-        var md5msg = CryptoJS.MD5(databag + this.secretKey);
-        var authHeader:string = CryptoJS.enc.Hex.stringify(md5msg);
-        var url:string = this.apiUrl + this.gameKey + '/' + event;
+        /**
+         * Sends a message to GA
+         *
+         * @param databag
+         * @param event
+         * @param responseHandler
+         */
+        private sendEvent(databag: string, event: string, responseHandler: (response: Events.Response) => void = null)
+        {
+            if (null === GameAnalytics.instance && null === this.gameKey) {
+                throw new Error('No instance available!');
+            }
 
-        GARequest.post(
-            url,
-            databag,
-            authHeader,
-            (response) => {
-                if (response.success === false) {
-                    if (window.console) {
-                        console.log(response.message);
+            if (databag.length < 1) {
+                return;
+            }
+
+            var encryptedMessage = CryptoJS.HmacSHA256(databag, this.secretKey);
+            var authHeader:string = CryptoJS.enc.Base64.stringify(encryptedMessage);
+            var url:string = GameAnalytics.API_URL + this.gameKey + '/' + event;
+
+            GA.Utils.postRequest(
+                url,
+                databag,
+                authHeader,
+                (response: Utils.Response) => {
+                    if (response.success === false) {
+                        if (window.console) {
+                            console.log(response.message);
+                        }
+                    }
+
+                    if (responseHandler != null) {
+                        var r = '';
+                        try {
+                            r = JSON.parse(response.message);
+                        } catch(e) {}
+
+                        responseHandler(r);
                     }
                 }
-            }
-        );
+            );
+        }
     }
 }

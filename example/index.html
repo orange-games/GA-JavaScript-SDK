@@ -4,20 +4,27 @@
     <title>GameAnalytics for Javascript example</title>
 
     <!-- Game Analytics inclusion -->
-    <script type="text/javascript" src="../bin/GaJavaScriptSdk-1.1.0.min.js"></script>
+    <script type="text/javascript" src="../dist/GaJavaScriptSdk-2.0.0.min.js"></script>
 
     <!-- Let's setup gameanalytics -->
     <script type="text/javascript">
-        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
-        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
-        var build = "1.0"; //The current version of your game, it's wise to bump this with every analytics/game change
-        var user = Date.now().toString(); //Unique user ID, handy for getting sessions
+        //For the test game
+//        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
+//        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
+
+        //Sandbox variables
+        var gameKey = "5c6bcb5402204249437fb5a7a80a4959";
+        var secretKey = "16813a12f718bc5c620f56944e1abc3ea13ccbac";
+
+        var build = "2.0"; //The current version of your game, it's wise to bump this with every analytics/game change
+
+        var user = new GA.User(Date.now().toString(), undefined, GA.Gender.male, 1970);
 
         //Create an instance
-        var GA = GameAnalytics.getInstance();
-
-        //Setup game analytics
-        GA.init(gameKey, secretKey, build, user);
+        GA.getInstance()
+            .init(gameKey, secretKey, build, user)
+            .addEvent(new GA.Events.User())
+            .addEvent(new GA.Events.Design('Game:Start'));
     </script>
 
     <!-- Game we want to track -->
@@ -77,8 +84,8 @@
 
                     timeout = setTimeout(self.tick.bind(self), speed);
 
-                    //Here we send a start event without any values
-                    GA.sendEvent(new DesignEvent('Game:Snake:Start'));
+                    //Here we sendEvent a start event without any values
+//                    GA.sendEvent(new DesignEvent('Game:Snake:Start'));
                     placeFood();
                 },
                 reset: function () {
@@ -107,8 +114,8 @@
                         if (body.hasOwnProperty(part) && body[part][0] === vx && body[part][1] === vy) {
                             clearInterval(timeout);
 
-                            //here we send a game end event, including the current score.
-                            GA.sendEvent(new DesignEvent('Game:Snake:End', body.length));
+                            //here we sendEvent a game end event, including the current score.
+//                            GA.sendEvent(new DesignEvent('Game:Snake:End', body.length));
 
                             a = confirm(body.length + ' pts! play again?');
                             if (a) {

@@ -1,16 +1,20 @@
 /// <reference path="../vendor/cryptojs.d.ts" />
 
 /// <reference path="GameAnalytics.ts" />
+/// <reference path="User.ts" />
 
-/// <reference path="utils/MessageQueue.ts" />
-/// <reference path="utils/Message.ts" />
-/// <reference path="utils/GAUniqueidUtil.ts" />
-/// <reference path="utils/GARequest.ts" />
-/// <reference path="utils/GADeviceUtil.ts" />
+/// <reference path="Utils/MessageQueue.ts" />
+/// <reference path="Utils/Message.ts" />
+/// <reference path="Utils/UniqueId.ts" />
+/// <reference path="Utils/PostRequest.ts" />
+/// <reference path="Utils/Annotations.ts" />
 
-/// <reference path="Events/GameAnalyticsEvent.ts" />
-/// <reference path="Events/GeneralEvent.ts" />
-/// <reference path="Events/DesignEvent.ts" />
-/// <reference path="Events/BusinessEvent.ts" />
-/// <reference path="Events/ErrorEvent.ts" />
-/// <reference path="Events/UserEvent.ts" />
+/// <reference path="Events/Business.ts" />
+/// <reference path="Events/Design.ts" />
+/// <reference path="Events/Exception.ts" />
+/// <reference path="Events/Event.ts" />
+/// <reference path="Events/Init.ts" />
+/// <reference path="Events/Progression.ts" />
+/// <reference path="Events/Resource.ts" />
+/// <reference path="Events/SessionEnd.ts" />
+/// <reference path="Events/User.ts" />
