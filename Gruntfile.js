@@ -48,7 +48,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    'bin/GaJavaScriptSdk.min.js': [
+                    'dist/GaJavaScriptSdk.min.js': [
                         'vendor/hmac-sha256.js',
                         'vendor/enc-base64-min.js',
                         'dist/GaJavaScriptSdk.js'
@@ -69,5 +69,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-banner');
 
     grunt.registerTask('dist', ['clean', 'typescript', 'uglify', 'usebanner']);
-    grunt.registerTask('dev', ['typescript']);
+    grunt.registerTask('dev', ['watch']);
 };

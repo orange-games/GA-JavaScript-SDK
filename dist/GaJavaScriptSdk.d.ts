@@ -1,5 +1,23 @@
 /// <reference path="../vendor/cryptojs.d.ts" />
 declare module GA {
+    enum Platform {
+        ios = 0,
+        android = 1,
+        windows = 2,
+        windows_phone = 3,
+        blackberry = 4,
+        roku = 5,
+        tizen = 6,
+        nacl = 7,
+        mac_osx = 8,
+        webplayer = 9,
+    }
+    enum Gender {
+        male = 0,
+        female = 1,
+    }
+}
+declare module GA {
     /**
      * Fetches an created instance
      *
@@ -82,7 +100,7 @@ declare module GA {
          *
          * @type {number}
          */
-        private serverTime;
+        private timeOffset;
         /**
          * This initializes the GameAnalytics stuff with some important parameters
          * GA won't work without!
@@ -120,10 +138,6 @@ declare module GA {
     }
 }
 declare module GA {
-    enum Gender {
-        male = 0,
-        female = 1,
-    }
     class User {
         user_id: string;
         facebook_id: string;
@@ -265,7 +279,7 @@ declare module GA {
             jailbroken?: boolean;
             android_id?: string;
         }
-        function getDefaultAnnotations(user: User, session_id: string, build: string): DefaultAnnotations;
+        function getDefaultAnnotations(user: User, session_id: string, build: string, timeOffset: number): DefaultAnnotations;
         function getBaseAnnotations(): BaseAnnotations;
     }
 }
@@ -358,7 +372,7 @@ declare module GA {
             /**
              * An integer timestamp of the current server time in UTC (seconds since EPOCH).
              */
-            severs_ts: number;
+            server_ts: number;
             /**
              * An array of strings. Not used at the moment. In the future this could contain flags set by GA servers to control SDK behaviour.
              */

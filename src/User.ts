@@ -2,11 +2,6 @@
 
 module GA
 {
-    export enum Gender {
-        male,
-        female
-    }
-
     export class User
     {
         public user_id: string = '';

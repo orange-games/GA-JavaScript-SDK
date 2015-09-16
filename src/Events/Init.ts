@@ -16,7 +16,7 @@ module GA
             /**
              * An integer timestamp of the current server time in UTC (seconds since EPOCH).
              */
-            public severs_ts:number;
+            public server_ts:number;
 
             /**
              * An array of strings. Not used at the moment. In the future this could contain flags set by GA servers to control SDK behaviour.

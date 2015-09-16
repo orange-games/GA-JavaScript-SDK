@@ -57,16 +57,16 @@ module GA
             android_id?:            string;
         }
 
-        export function getDefaultAnnotations(user: User, session_id: string, build: string): DefaultAnnotations
+        export function getDefaultAnnotations(user: User, session_id: string, build: string, timeOffset: number): DefaultAnnotations
         {
             var obj: DefaultAnnotations = {
                 sdk_version: GameAnalytics.SDK_VERSION,
-                platform: 'windows',
-                os_version: 'windows 8',
+                platform: GA.Platform[GA.Platform.windows],
+                os_version: GA.Platform[GA.Platform.windows] + ' 8',
                 device: 'unknown',
                 v: 2,
                 user_id: user.user_id,
-                client_ts: Date.now(),
+                client_ts: (Date.now()/ 1000 | 0) + timeOffset,
                 manufacturer: 'unknown',
                 session_id: session_id,
                 session_num: 1,
@@ -89,26 +89,26 @@ module GA
 
             if(ua.match(/iPad|iPod|iPhone/i)){
                 //code for iPad here
-                obj.platform = "iOS";
+                obj.platform = GA.Platform[GA.Platform.ios];
                 obj.device = ua.match(/iPad|iPod|iPhone/i)[0];
                 obj.manufacturer = 'Apple'
 
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = ua.substr(uaindex, 6).replace('_', '.');
+                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
             } else if(ua.match(/Android/i)){
                 //code for Android here
-                obj.platform = "Android";
+                obj.platform = GA.Platform[GA.Platform.android];
                 obj.device = (ua.match(/Mobile/i)) ? 'Phone' : 'Tablet';
 
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = ua.substr(uaindex, 11);
+                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 11);
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
-                obj.platform = "Windows";
+                obj.platform = GA.Platform[GA.Platform.windows];
                 obj.device = 'Windows Phone';
 
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = ua.substr(uaindex, 17);
+                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 17);
             }
 
             return obj;
@@ -127,22 +127,22 @@ module GA
 
             if(ua.match(/iPad|iPod|iPhone/i)){
                 //code for iPad here
-                obj.platform = "iOS";
+                obj.platform = GA.Platform[GA.Platform.ios];
 
-                var uaindex = ua.indexOf('iOS ');
-                obj.os_version = ua.substr(uaindex, 6).replace('_', '.');
+                var uaindex = ua.indexOf('OS ');
+                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
             } else if(ua.match(/Android/i)){
                 //code for Android here
-                obj.platform = "Android";
+                obj.platform = GA.Platform[GA.Platform.android];
 
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version =  ua.substr(uaindex, 11);
+                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 11);
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
-                obj.platform = "Windows";
+                obj.platform = GA.Platform[GA.Platform.windows];
 
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = ua.substr(uaindex, 17);
+                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 17);
             }
 
             return obj;

@@ -37,7 +37,7 @@ module GA
          *
          * @type {string}
          */
-        public static API_URL: string = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
+        public static API_URL: string = window.location.protocol + '//api.gameanalytics.com/v2/';
 
         /**
          * Stored instance for GameAnalytics
@@ -107,7 +107,7 @@ module GA
          *
          * @type {number}
          */
-        private serverTime: number = 0;
+        private timeOffset: number = 0;
 
         /**
          * This initializes the GameAnalytics stuff with some important parameters
@@ -134,6 +134,7 @@ module GA
                 this.initProcessed = true;
                 if (response.enabled === true) {
                     this.enabled = true;
+                    this.timeOffset = (Date.now()/ 1000 | 0) - response.server_ts;
                 }
             });
 
@@ -159,7 +160,7 @@ module GA
                 throw new Error('No instance available!');
             }
 
-            var m = new Utils.Message(event, Utils.getDefaultAnnotations(this.user, this.sessionId, this.build));
+            var m = new Utils.Message(event, Utils.getDefaultAnnotations(this.user, this.sessionId, this.build, this.timeOffset));
             this.messageQueue.push(m);
 
             return this;

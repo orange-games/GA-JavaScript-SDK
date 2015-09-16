@@ -4,25 +4,22 @@
     <title>GameAnalytics for Javascript example</title>
 
     <!-- Game Analytics inclusion -->
-    <script type="text/javascript" src="../dist/GaJavaScriptSdk-2.0.0.min.js"></script>
+    <script type="text/javascript" src="../vendor/hmac-sha256.js"></script>
+    <script type="text/javascript" src="../vendor/enc-base64-min.js"></script>
+    <script type="text/javascript" src="../dist/GaJavaScriptSdk.js"></script>
 
     <!-- Let's setup gameanalytics -->
     <script type="text/javascript">
         //For the test game
-//        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
-//        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
-
-        //Sandbox variables
-        var gameKey = "5c6bcb5402204249437fb5a7a80a4959";
-        var secretKey = "16813a12f718bc5c620f56944e1abc3ea13ccbac";
-
+        var gameKey = "a50a4caeda2e82fd1bedc5aca519ed12"; //Your gamekey
+        var secretKey = "790518ec21b665def89412852862081649cf2a9c"; //Your secret key
         var build = "2.0"; //The current version of your game, it's wise to bump this with every analytics/game change
 
         var user = new GA.User(Date.now().toString(), undefined, GA.Gender.male, 1970);
 
         //Create an instance
-        GA.getInstance()
-            .init(gameKey, secretKey, build, user)
+        var gaan = GA.getInstance();
+        gaan.init(gameKey, secretKey, build, user)
             .addEvent(new GA.Events.User())
             .addEvent(new GA.Events.Design('Game:Start'));
     </script>
@@ -37,6 +34,7 @@
             var x = 20,  y = 20, z = 20,
                 vx = 0, vy = 0, length = 0,
                 body = [],
+                level = 0,
                 canvas,
                 ctx,
                 dir = 2, mdir = 2,
@@ -85,13 +83,16 @@
                     timeout = setTimeout(self.tick.bind(self), speed);
 
                     //Here we sendEvent a start event without any values
-//                    GA.sendEvent(new DesignEvent('Game:Snake:Start'));
+                    gaan.addEvent(new GA.Events.Design('Game:Start'));
+                    gaan.addEvent(new GA.Events.Progression('Start:Level' + level));
                     placeFood();
                 },
                 reset: function () {
                     body = [];
                     dir = 2;
                     length = 0;
+                    speed = 150;
+                    level = 0;
                     vx = 0;
                     vy = 0;
                     timeout = null;
@@ -115,7 +116,9 @@
                             clearInterval(timeout);
 
                             //here we sendEvent a game end event, including the current score.
-//                            GA.sendEvent(new DesignEvent('Game:Snake:End', body.length));
+                            gaan.addEvent(new GA.Events.Progression('Fail:Level' + level, 1, body.length))
+                                .addEvent(new GA.Events.Design('Game:End', body.length))
+                                .sendData(); //make sure data is send at gameover
 
                             a = confirm(body.length + ' pts! play again?');
                             if (a) {
@@ -135,6 +138,13 @@
                     hit = ctx.getImageData((x * vx) + (z / 2), (y * vy) + (z / 2), 1, 1);
                     if (hit.data[0] === 255) {
                         length += 1;
+                        if (length % 5 === 0) {
+                            gaan.addEvent(new GA.Events.Progression('Complete:Level' + level), 1, length);
+                            level ++;
+                            speed -= 20;
+                            gaan.addEvent(new GA.Events.Progression('Start:Level' + level));
+
+                        }
                         placeFood();
                         //ctx.clearRect(0, 0, z * x, z);
                     }

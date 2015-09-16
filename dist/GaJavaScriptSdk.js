@@ -1,12 +1,33 @@
 /*!
- * GA-JavaScript-SDK - version 2.0.0 
+ * GA-JavaScript-SDK - version 2.0.1 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Gembly BV
- * Build at 02-09-2015
+ * Build at 16-09-2015
  * Released under GNUv3 License 
  */
 
+var GA;
+(function (GA) {
+    (function (Platform) {
+        Platform[Platform["ios"] = 0] = "ios";
+        Platform[Platform["android"] = 1] = "android";
+        Platform[Platform["windows"] = 2] = "windows";
+        Platform[Platform["windows_phone"] = 3] = "windows_phone";
+        Platform[Platform["blackberry"] = 4] = "blackberry";
+        Platform[Platform["roku"] = 5] = "roku";
+        Platform[Platform["tizen"] = 6] = "tizen";
+        Platform[Platform["nacl"] = 7] = "nacl";
+        Platform[Platform["mac_osx"] = 8] = "mac_osx";
+        Platform[Platform["webplayer"] = 9] = "webplayer";
+    })(GA.Platform || (GA.Platform = {}));
+    var Platform = GA.Platform;
+    (function (Gender) {
+        Gender[Gender["male"] = 0] = "male";
+        Gender[Gender["female"] = 1] = "female";
+    })(GA.Gender || (GA.Gender = {}));
+    var Gender = GA.Gender;
+})(GA || (GA = {}));
 /// <reference path="references.ts" />
 var GA;
 (function (GA) {
@@ -63,7 +84,7 @@ var GA;
              *
              * @type {number}
              */
-            this.serverTime = 0;
+            this.timeOffset = 0;
         }
         /**
          * This initializes the GameAnalytics stuff with some important parameters
@@ -88,6 +109,7 @@ var GA;
                 _this.initProcessed = true;
                 if (response.enabled === true) {
                     _this.enabled = true;
+                    _this.timeOffset = (Date.now() / 1000 | 0) - response.server_ts;
                 }
             });
             //Start the interval. The queue should be emptied every 15 seconds
@@ -107,7 +129,7 @@ var GA;
             if (null === GameAnalytics.instance) {
                 throw new Error('No instance available!');
             }
-            var m = new GA.Utils.Message(event, GA.Utils.getDefaultAnnotations(this.user, this.sessionId, this.build));
+            var m = new GA.Utils.Message(event, GA.Utils.getDefaultAnnotations(this.user, this.sessionId, this.build, this.timeOffset));
             this.messageQueue.push(m);
             return this;
         };
@@ -208,7 +230,7 @@ var GA;
          *
          * @type {string}
          */
-        GameAnalytics.API_URL = window.location.protocol + '//sandbox-api.gameanalytics.com/v2/';
+        GameAnalytics.API_URL = window.location.protocol + '//api.gameanalytics.com/v2/';
         /**
          * Stored instance for GameAnalytics
          *
@@ -222,11 +244,6 @@ var GA;
 /// <reference path="references.ts" />
 var GA;
 (function (GA) {
-    (function (Gender) {
-        Gender[Gender["male"] = 0] = "male";
-        Gender[Gender["female"] = 1] = "female";
-    })(GA.Gender || (GA.Gender = {}));
-    var Gender = GA.Gender;
     var User = (function () {
         function User(user_id, facebook_id, gender, birth_year) {
             this.user_id = '';
@@ -235,6 +252,9 @@ var GA;
             }
             if (facebook_id && facebook_id.length > 0) {
                 this.facebook_id = facebook_id;
+                //https://github.com/GameAnalytics/GA-SDK-UNREAL/wiki/Set-Facebook-Id
+                //User Id must be set to the player's Facebook Id.
+                this.user_id = facebook_id;
             }
             if (gender === 1 /* female */ || gender === 0 /* male */) {
                 this.gender = gender;
@@ -434,15 +454,15 @@ var GA;
 (function (GA) {
     var Utils;
     (function (Utils) {
-        function getDefaultAnnotations(user, session_id, build) {
+        function getDefaultAnnotations(user, session_id, build, timeOffset) {
             var obj = {
                 sdk_version: GA.GameAnalytics.SDK_VERSION,
-                platform: 'windows',
-                os_version: 'windows 8',
+                platform: GA.Platform[2 /* windows */],
+                os_version: GA.Platform[2 /* windows */] + ' 8',
                 device: 'unknown',
                 v: 2,
                 user_id: user.user_id,
-                client_ts: Date.now(),
+                client_ts: (Date.now() / 1000 | 0) + timeOffset,
                 manufacturer: 'unknown',
                 session_id: session_id,
                 session_num: 1,
@@ -460,25 +480,25 @@ var GA;
             var ua = navigator.userAgent;
             if (ua.match(/iPad|iPod|iPhone/i)) {
                 //code for iPad here
-                obj.platform = "iOS";
+                obj.platform = GA.Platform[0 /* ios */];
                 obj.device = ua.match(/iPad|iPod|iPhone/i)[0];
                 obj.manufacturer = 'Apple';
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = ua.substr(uaindex, 6).replace('_', '.');
+                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
             }
             else if (ua.match(/Android/i)) {
                 //code for Android here
-                obj.platform = "Android";
+                obj.platform = GA.Platform[1 /* android */];
                 obj.device = (ua.match(/Mobile/i)) ? 'Phone' : 'Tablet';
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = ua.substr(uaindex, 11);
+                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 11);
             }
             else if (ua.match(/Windows Phone/i)) {
                 //code for Windows phone here
-                obj.platform = "Windows";
+                obj.platform = GA.Platform[2 /* windows */];
                 obj.device = 'Windows Phone';
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = ua.substr(uaindex, 17);
+                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 17);
             }
             return obj;
         }
@@ -492,21 +512,21 @@ var GA;
             var ua = navigator.userAgent;
             if (ua.match(/iPad|iPod|iPhone/i)) {
                 //code for iPad here
-                obj.platform = "iOS";
-                var uaindex = ua.indexOf('iOS ');
-                obj.os_version = ua.substr(uaindex, 6).replace('_', '.');
+                obj.platform = GA.Platform[0 /* ios */];
+                var uaindex = ua.indexOf('OS ');
+                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
             }
             else if (ua.match(/Android/i)) {
                 //code for Android here
-                obj.platform = "Android";
+                obj.platform = GA.Platform[1 /* android */];
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = ua.substr(uaindex, 11);
+                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 11);
             }
             else if (ua.match(/Windows Phone/i)) {
                 //code for Windows phone here
-                obj.platform = "Windows";
+                obj.platform = GA.Platform[2 /* windows */];
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = ua.substr(uaindex, 17);
+                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 17);
             }
             return obj;
         }
