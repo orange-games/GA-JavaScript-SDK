@@ -68,7 +68,7 @@ Progression events are used to track attempts at completing levels in order to p
 
 ```javascript
 var progressStart = new GA.Events.Progression(
-    'Start:Shpping'  //A 2-4 part event id.
+    'Start:Shopping'  //A 2-4 part event id.
 );
 
 var progressFail = new GA.Events.Progression(
