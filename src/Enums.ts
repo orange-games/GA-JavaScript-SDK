@@ -1,4 +1,3 @@
-
 module GA {
     export enum Platform {
         ios,

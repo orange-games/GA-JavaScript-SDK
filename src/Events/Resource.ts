@@ -1,5 +1,3 @@
-/// <reference path="../references.ts" />
-
 module GA
 {
     export module Events

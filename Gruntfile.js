@@ -33,7 +33,8 @@ module.exports = function (grunt) {
                     target: 'es5',
                     basePath: 'src',
                     sourceMap: true,
-                    declaration: true
+                    declaration: true,
+                    references: 'vendor/*.d.ts'
                 }
             }
         },
