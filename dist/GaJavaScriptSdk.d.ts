@@ -1,4 +1,3 @@
-/// <reference path="../vendor/cryptojs.d.ts" />
 declare module GA {
     enum Platform {
         ios = 0,
