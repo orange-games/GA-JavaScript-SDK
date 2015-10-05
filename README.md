@@ -152,7 +152,7 @@ Only one session end event per session should be activated.
 ```javascript
 var sessionDuration = (Date.now() - sessionStart) / 1000;
 
-var event = new GA.Events.Session(
+var event = new GA.Events.SessionEnd(
     sessionDuration //the length of the session in seconds
 );
 
