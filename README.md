@@ -41,6 +41,26 @@ var gaan = GA.getInstance();
 gaan.init(gameKey, secretKey, build, user)
 ```
 
+After setting everything up correctly you should be able to see Events comming in on the live-feed at your game in GameAnalytics.
+
+Not seeing events appearing? Check our [troubleshooting guide](#Troubleshooting)
+
+### Processing Queue
+
+Events normally are added trough the addEvent method
+
+```javascript
+GA.getInstance().addEvent(event);
+```
+
+Added events are not immediately send to GameAnalytics, instead they are added to an internal queue that is drained every 15 seconds. Multiple events are grouped and then send as a single request. This way there is less connections made to the GameAnalytics servers, and this keeps them happy.
+
+It is possible to drain the queue yourself, by using the sendData() method.
+
+```javascript
+GA.getInstance().sendData();
+```
+
 Events
 ------
 
@@ -186,6 +206,18 @@ window.addEventListener('error', function (event) {
 
 ```
 
+Troubleshooting
+---------------
+
+### I don't see any events in the live-feed
+
+First of all, make sure your keys are correctly set up.
+Also note that the events are queued and drained every 15s, so it might take some time in the beginning before any events are set.
+
+The library also sends an Init event to GameAnalytics, this is to check if a user is allowed to send events, if the user isn't then events won't be send so we don't hammer GameAnalytics unnecessary.
+
+**Still having trouble? Submit an [issue](https://github.com/gembly/GA-JavaScript-SDK/issues)**
+
 Changelog
 ---------
 
@@ -202,4 +234,8 @@ Changelog
 * Added correction for server time difference
 
 **2.0.0**
-* Reworked everything to work with GameAnalytics v2 API
+* Reworked everything to work with GameAnalytics v2 API]
+
+Disclaimer
+----------
+We are in no way affiliated with GameAnalytics. We just like making HTML5 games and we needed some analytics in our games, hence this library was born.
