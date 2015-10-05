@@ -42,20 +42,32 @@ module.exports = function (grunt) {
             build: ["dist"]
         },
         uglify: {
-            options: {
-                compress: {},
-                mangle: true,
-                beautify: false
-            },
             dist: {
                 files: {
-                    'dist/GaJavaScriptSdk.min.js': [
+                    'dist/GaJavaScriptSdk.js': [
                         'vendor/hmac-sha256.js',
                         'vendor/enc-base64-min.js',
                         'dist/GaJavaScriptSdk.js'
                     ]
+                },
+                options: {
+                    compress: {},
+                    mangle: false,
+                    beautify: true
                 }
-            }
+            },
+            distMinified: {
+                files: {
+                    'dist/GaJavaScriptSdk.min.js': [
+                        'dist/GaJavaScriptSdk.js'
+                    ]
+                },
+                options: {
+                    compress: {},
+                    mangle: true,
+                    beautify: false
+                }
+            },
         },
         watch: {
             files: ['src/**/*.ts'],
