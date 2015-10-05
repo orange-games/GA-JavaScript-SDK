@@ -37,7 +37,7 @@ module GA
          *
          * @type {string}
          */
-        public static API_URL: string = window.location.protocol + '//api.gameanalytics.com/v2/';
+        public static API_URL: string = ('https:' === document.location.protocol ? 'https' : 'http') + '://api.gameanalytics.com/v2/';
 
         /**
          * Stored instance for GameAnalytics

@@ -85,9 +85,35 @@ describe("Events", function () {
 
     describe("Progression", function () {
         it("Should be of category progression", function () {
-            var b = new GA.Events.Progression('Start:level1');
+            var b = new GA.Events.Progression('Start:level1', 1, 1);
 
             expect(b.category).to.equal(GA.Events.Category.progression);
+        });
+
+        it("Should throw an error if an incorrect event_id is supplied", function () {
+            var InvalidIds = [
+                'asdasd',
+                'asdasf2@$',
+                'foo:bar',
+                'foo:bar:baz:bin',
+                1234123,
+                true,
+                undefined
+            ];
+
+            InvalidIds.forEach(function (id) {
+                expect(function () {
+                    var b = new GA.Events.Progression(id, 1, 1);
+                }).to.throw(Error);
+            });
+        });
+    });
+
+    describe("Init", function () {
+        it("should work correctly?", function () {
+            var e = new GA.Events.Init({foo:'bar'});
+
+            expect(e.toString()).to.be.a('string');
         });
     });
 });

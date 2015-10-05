@@ -1,9 +1,9 @@
 /*!
- * GA-JavaScript-SDK - version 2.0.1 
+ * GA-JavaScript-SDK - version 2.0.2 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Gembly BV
- * Build at 16-09-2015
+ * Build at 05-10-2015
  * Released under GNUv3 License 
  */
 
@@ -230,7 +230,7 @@ var GA;
          *
          * @type {string}
          */
-        GameAnalytics.API_URL = window.location.protocol + '//api.gameanalytics.com/v2/';
+        GameAnalytics.API_URL = ('https:' === document.location.protocol ? 'https' : 'http') + '://api.gameanalytics.com/v2/';
         /**
          * Stored instance for GameAnalytics
          *
@@ -484,21 +484,21 @@ var GA;
                 obj.device = ua.match(/iPad|iPod|iPhone/i)[0];
                 obj.manufacturer = 'Apple';
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
+                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 5).replace(/_/gi, '.');
             }
             else if (ua.match(/Android/i)) {
                 //code for Android here
                 obj.platform = GA.Platform[1 /* android */];
                 obj.device = (ua.match(/Mobile/i)) ? 'Phone' : 'Tablet';
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 11);
+                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 5);
             }
             else if (ua.match(/Windows Phone/i)) {
                 //code for Windows phone here
                 obj.platform = GA.Platform[2 /* windows */];
                 obj.device = 'Windows Phone';
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 17);
+                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 3);
             }
             return obj;
         }
@@ -514,19 +514,19 @@ var GA;
                 //code for iPad here
                 obj.platform = GA.Platform[0 /* ios */];
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
+                obj.os_version = GA.Platform[0 /* ios */] + ' ' + ua.substr(uaindex + 3, 5).replace(/_/gi, '.');
             }
             else if (ua.match(/Android/i)) {
                 //code for Android here
                 obj.platform = GA.Platform[1 /* android */];
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 11);
+                obj.os_version = GA.Platform[1 /* android */] + ' ' + ua.substr(uaindex + 8, 5);
             }
             else if (ua.match(/Windows Phone/i)) {
                 //code for Windows phone here
                 obj.platform = GA.Platform[2 /* windows */];
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 17);
+                obj.os_version = GA.Platform[2 /* windows */] + ' ' + ua.substr(uaindex + 14, 3);
             }
             return obj;
         }
@@ -762,7 +762,7 @@ var GA;
 (function (GA) {
     var Events;
     (function (Events) {
-        var eventIdCheck = /^(Sink|Source):[A-Za-z]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}/;
+        var eventIdCheck = /^[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}$/;
         var Business = (function () {
             function Business(event_id, amount, currency, transaction_num, cart_type, receipt_info) {
                 /**
@@ -776,18 +776,21 @@ var GA;
                  * @type {number}
                  */
                 this.transaction_num = 0;
-                if (null === event_id.match(eventIdCheck)) {
+                if (!event_id || null === event_id.match(eventIdCheck)) {
                     throw new Error('Invalid event_id supplied for BusinessEvent');
                 }
                 this.event_id = event_id;
                 this.amount = amount;
-                if (null === currency.match(/^[A-Z]{3}$/)) {
+                if (!currency || null === currency.match(/^[A-Z]{3}$/)) {
                     throw new Error('Invalid currency supplied for BusinessEvent');
                 }
                 this.currency = currency;
                 this.transaction_num = transaction_num;
-                if (cart_type !== undefined) {
-                    this.cart_type = cart_type.substr(0, 32);
+                if (cart_type) {
+                    if (cart_type.length > 32) {
+                        throw new Error('A too long cart_type was supplied, should be max 32 characters');
+                    }
+                    this.cart_type = cart_type;
                 }
                 if (receipt_info !== undefined) {
                     this.receipt_info = receipt_info;

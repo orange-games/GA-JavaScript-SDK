@@ -94,21 +94,21 @@ module GA
                 obj.manufacturer = 'Apple'
 
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
+                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 5).replace(/_/gi, '.');
             } else if(ua.match(/Android/i)){
                 //code for Android here
                 obj.platform = GA.Platform[GA.Platform.android];
                 obj.device = (ua.match(/Mobile/i)) ? 'Phone' : 'Tablet';
 
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 11);
+                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 5);
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
                 obj.platform = GA.Platform[GA.Platform.windows];
                 obj.device = 'Windows Phone';
 
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 17);
+                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 3);
             }
 
             return obj;
@@ -130,19 +130,19 @@ module GA
                 obj.platform = GA.Platform[GA.Platform.ios];
 
                 var uaindex = ua.indexOf('OS ');
-                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 4).replace(/_/gi, '.');
+                obj.os_version = GA.Platform[GA.Platform.ios] + ' ' + ua.substr(uaindex + 3, 5).replace(/_/gi, '.');
             } else if(ua.match(/Android/i)){
                 //code for Android here
                 obj.platform = GA.Platform[GA.Platform.android];
 
                 var uaindex = ua.indexOf('Android ');
-                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 11);
+                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.substr(uaindex + 8, 5);
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
                 obj.platform = GA.Platform[GA.Platform.windows];
 
                 var uaindex = ua.indexOf('Windows Phone ');
-                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 17);
+                obj.os_version = GA.Platform[GA.Platform.windows] + ' ' + ua.substr(uaindex + 14, 3);
             }
 
             return obj;
