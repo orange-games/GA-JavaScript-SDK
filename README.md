@@ -221,6 +221,9 @@ The library also sends an Init event to GameAnalytics, this is to check if a use
 Changelog
 ---------
 
+**2.0.3**
+* Changed os version to use regexp so all version numbers are included
+
 **2.0.2**
 * Fixed an issue where the wrong OS versions are send
 * Made sure http/https is used

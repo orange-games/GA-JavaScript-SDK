@@ -1,9 +1,9 @@
 /*!
- * GA-JavaScript-SDK - version 2.0.2 
+ * ga-javascript-sdk - version 2.0.3 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Gembly BV
- * Build at 05-10-2015
+ * Build at 06-10-2015
  * Released under GNUv3 License 
  */
 
@@ -508,16 +508,16 @@ var GA;
             var ua = navigator.userAgent;
             if (ua.match(/iPad|iPod|iPhone/i)) {
                 obj.platform = GA.Platform[0], obj.device = ua.match(/iPad|iPod|iPhone/i)[0], obj.manufacturer = "Apple";
-                var uaindex = ua.indexOf("OS ");
-                obj.os_version = GA.Platform[0] + " " + ua.substr(uaindex + 3, 5).replace(/_/gi, ".");
+                ua.indexOf("OS ");
+                obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".");
             } else if (ua.match(/Android/i)) {
                 obj.platform = GA.Platform[1], obj.device = ua.match(/Mobile/i) ? "Phone" : "Tablet";
-                var uaindex = ua.indexOf("Android ");
-                obj.os_version = GA.Platform[1] + " " + ua.substr(uaindex + 8, 5);
+                ua.indexOf("Android ");
+                obj.os_version = GA.Platform[1] + " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
             } else if (ua.match(/Windows Phone/i)) {
                 obj.platform = GA.Platform[2], obj.device = "Windows Phone";
-                var uaindex = ua.indexOf("Windows Phone ");
-                obj.os_version = GA.Platform[2] + " " + ua.substr(uaindex + 14, 3);
+                ua.indexOf("Windows Phone ");
+                obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1];
             }
             return obj;
         }
@@ -529,16 +529,16 @@ var GA;
             }, ua = navigator.userAgent;
             if (ua.match(/iPad|iPod|iPhone/i)) {
                 obj.platform = GA.Platform[0];
-                var uaindex = ua.indexOf("OS ");
-                obj.os_version = GA.Platform[0] + " " + ua.substr(uaindex + 3, 5).replace(/_/gi, ".");
+                ua.indexOf("OS ");
+                obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".");
             } else if (ua.match(/Android/i)) {
                 obj.platform = GA.Platform[1];
-                var uaindex = ua.indexOf("Android ");
-                obj.os_version = GA.Platform[1] + " " + ua.substr(uaindex + 8, 5);
+                ua.indexOf("Android ");
+                obj.os_version = GA.Platform[1] + " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
             } else if (ua.match(/Windows Phone/i)) {
                 obj.platform = GA.Platform[2];
-                var uaindex = ua.indexOf("Windows Phone ");
-                obj.os_version = GA.Platform[2] + " " + ua.substr(uaindex + 14, 3);
+                ua.indexOf("Windows Phone ");
+                obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1];
             }
             return obj;
         }
