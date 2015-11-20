@@ -1,9 +1,9 @@
 /*!
- * ga-javascript-sdk - version 2.0.3 
+ * ga-javascript-sdk - version 2.0.4 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Gembly BV
- * Build at 20-10-2015
+ * Build at 20-11-2015
  * Released under GNUv3 License 
  */
 
@@ -377,7 +377,7 @@ var GA;
     var Events;
     !function(Events) {
         var SessionEnd = function() {
-            function SessionEnd(lenth) {
+            function SessionEnd(length) {
                 this.category = 4, this.length = 0, this.length = length;
             }
             return SessionEnd;

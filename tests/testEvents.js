@@ -57,7 +57,7 @@ describe("Events", function () {
         });
     });
 
-    describe("Resourse", function () {
+    describe("Resource", function () {
         it("Should be of category Resource", function () {
             var b = new GA.Events.Resource('Sink:foo:bar:baz', 1);
 
@@ -115,5 +115,14 @@ describe("Events", function () {
 
             expect(e.toString()).to.be.a('string');
         });
+    });
+
+    describe("SessionEndf", function () {
+       it('should have a lenght that equals the given parameter', function () {
+           var l = 180;
+           var s = new GA.Events.SessionEnd(l);
+
+           expect(s.length).to.equal(l);
+       })
     });
 });

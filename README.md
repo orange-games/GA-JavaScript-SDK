@@ -221,6 +221,9 @@ The library also sends an Init event to GameAnalytics, this is to check if a use
 Changelog
 ---------
 
+**2.0.4**
+* Fixed a typo in the SessionEnd event that gave wrong session times
+
 **2.0.3**
 * Changed os version to use regexp so all version numbers are included
 

@@ -23,7 +23,7 @@ module GA
              */
             public length: number = 0;
 
-            constructor(lenth: number)
+            constructor(length: number)
             {
                 this.length = length;
             }

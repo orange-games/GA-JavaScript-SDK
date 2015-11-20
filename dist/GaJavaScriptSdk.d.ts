@@ -235,7 +235,7 @@ declare module GA {
              * @type {number}
              */
             length: number;
-            constructor(lenth: number);
+            constructor(length: number);
         }
     }
 }
