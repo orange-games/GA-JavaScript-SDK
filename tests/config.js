@@ -22,7 +22,7 @@ module.exports = function (config) {
 
         // list of files to exclude
         exclude: [
-            'bin/*.min.js'
+            'dist/*.min.js'
         ],
 
         // test results reporter to use
@@ -34,7 +34,7 @@ module.exports = function (config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            'bin/*.js': ['coverage']
+            'dist/*.js': ['coverage']
         },
 
         // web server port
