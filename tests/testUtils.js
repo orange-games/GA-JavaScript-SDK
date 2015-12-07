@@ -25,9 +25,10 @@ describe("Utils", function () {
                 this.xhr = sinon.useFakeXMLHttpRequest();
 
                 this.requests = [];
+                var self = this;
                 this.xhr.onCreate = function(xhr) {
-                    this.requests.push(xhr);
-                }.bind(this);
+                    self.requests.push(xhr);
+                };
             });
 
             afterEach(function () {
