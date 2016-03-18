@@ -1,7 +1,7 @@
 var expect = chai.expect;
 
 describe("User", function () {
-    it("should always set the user_id", function () {
+    it("should set the user_id or get one from the library", function () {
             var userId = 'mycustomid';
             var user1 = new GA.User();
             var user2 = new GA.User(userId);
@@ -9,7 +9,7 @@ describe("User", function () {
             expect(user1).to.have.property('user_id');
             expect(user2).to.have.property('user_id');
 
-            expect(user1.user_id).to.equal('');
+            expect(user1.user_id.match('[0-9a-f-]{13}-4[0-9a-f]{3}-[0-9a-f-]{17}').length).to.equal(1);
             expect(user2.user_id).to.equal(userId);
         }
     );

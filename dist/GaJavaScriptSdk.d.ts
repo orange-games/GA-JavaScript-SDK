@@ -350,6 +350,12 @@ declare module GA {
          */
         init(gameKey: string, secretKey: string, build: string, user: User): GameAnalytics;
         /**
+         * We check the cache for the session number (if it exists at all) and than increment it
+         *
+         * @param user
+         */
+        private incrementSessionNum(user);
+        /**
          * Adds an event to the message queue
          *
          * @param event
@@ -381,7 +387,7 @@ declare module GA {
         facebook_id: string;
         gender: Gender;
         birth_year: number;
-        constructor(user_id: string, facebook_id?: string, gender?: Gender, birth_year?: number);
+        constructor(user_id?: string, facebook_id?: string, gender?: Gender, birth_year?: number);
     }
 }
 declare module GA {
@@ -430,6 +436,16 @@ declare module GA {
         }
         function getDefaultAnnotations(user: User, session_id: string, build: string, timeOffset: number): DefaultAnnotations;
         function getBaseAnnotations(): BaseAnnotations;
+    }
+}
+declare module GA {
+    module Utils {
+        class LocalStorage {
+            static Available: boolean;
+            static CacheKey: string;
+            static getItem(key: string): string;
+            static setItem(key: string, value: string): void;
+        }
     }
 }
 declare module GA {
@@ -519,5 +535,6 @@ declare module GA {
          * @returns {String}
          */
         function createUniqueId(): string;
+        function createUniqueUserId(): string;
     }
 }

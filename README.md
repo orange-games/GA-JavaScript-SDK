@@ -34,7 +34,11 @@ var build = "1.0"; //The current version of your game, it's wise to bump this wi
 //Third is the gender of the user, for now GameAnalytics only accepts Male|Female
 //And last is user's birth year, all for those awesome stats!
 var user = new GA.User(Date.now().toString(), undefined, GA.Gender.male, 1970);
+```
+Usually you're backend/platform keeps track of this data, but if you don't then just create an empty user object. The library will create an userId for you, and make sure the session number is correctly updated
 
+Now let's instanciate this thingy:
+```javascript
 //Create an instance, initialise it!
 //Here we use all those things we defined before, now everything should be set up correctly!
 var gaan = GA.getInstance();
@@ -220,6 +224,9 @@ The library also sends an Init event to GameAnalytics, this is to check if a use
 
 Changelog
 ---------
+
+**2.1.0**
+* Changed the way userId's are handled and made sure session_num is used
 
 **2.0.4**
 * Fixed a typo in the SessionEnd event that gave wrong session times

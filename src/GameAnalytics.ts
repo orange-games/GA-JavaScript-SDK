@@ -119,13 +119,16 @@ module GA
         public init(gameKey: string, secretKey: string, build: string, user: User): GameAnalytics
         {
             if (null === GameAnalytics.instance) {
-                throw new Error('No instance available!');
+                throw new Error('No instance Available!');
             }
 
             this.gameKey = gameKey;
             this.secretKey = secretKey;
             this.build = build;
             this.user = user;
+
+            //increment the stored session_number (if any exists) and save it
+            this.incrementSessionNum(user);
 
             var initEvent = new Events.Init(Utils.getBaseAnnotations());
             this.sendEvent(initEvent.toString(), 'init', (response: GA.Events.InitResponse) => {
@@ -148,6 +151,22 @@ module GA
         }
 
         /**
+         * We check the cache for the session number (if it exists at all) and than increment it
+         *
+         * @param user
+         */
+        private incrementSessionNum(user: User) {
+            var sessionNum: string = Utils.LocalStorage.getItem(user.user_id);
+            if (sessionNum) {
+                Utils.LocalStorage.setItem(user.user_id, (parseInt(sessionNum) + 1).toString());
+            } else {
+                sessionNum = '1';
+
+                Utils.LocalStorage.setItem(user.user_id, sessionNum);
+            }
+        }
+
+        /**
          * Adds an event to the message queue
          *
          * @param event
@@ -155,7 +174,7 @@ module GA
         public addEvent(event: Events.Event): GameAnalytics
         {
             if (null === GameAnalytics.instance) {
-                throw new Error('No instance available!');
+                throw new Error('No instance Available!');
             }
 
             var m = new Utils.Message(event, Utils.getDefaultAnnotations(this.user, this.sessionId, this.build, this.timeOffset));
@@ -180,7 +199,7 @@ module GA
             }
 
             if (null === GameAnalytics.instance) {
-                throw new Error('No instance available!');
+                throw new Error('No instance Available!');
             }
 
             var data:Array<Object> = [];
@@ -232,7 +251,7 @@ module GA
         private sendEvent(databag: string, event: string, responseHandler: (response: Events.Response) => void = null)
         {
             if (null === GameAnalytics.instance && null === this.gameKey) {
-                throw new Error('No instance available!');
+                throw new Error('No instance Available!');
             }
 
             if (databag.length < 1) {

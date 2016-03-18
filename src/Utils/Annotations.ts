@@ -67,7 +67,7 @@ module GA
                 client_ts: (Date.now()/ 1000 | 0) + timeOffset,
                 manufacturer: 'unknown',
                 session_id: session_id,
-                session_num: 1,
+                session_num: getSessionNumber(user.user_id),
                 build: build
             };
 
@@ -138,6 +138,15 @@ module GA
             }
 
             return obj;
+        }
+
+        function getSessionNumber(userId): number {
+            var sessionNum: string = Utils.LocalStorage.getItem(userId);
+            if (sessionNum) {
+                return parseInt(sessionNum);
+            }
+
+            return 1;
         }
     }
 }

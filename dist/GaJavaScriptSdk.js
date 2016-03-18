@@ -1,9 +1,9 @@
 /*!
- * ga-javascript-sdk - version 2.0.4 
+ * ga-javascript-sdk - version 2.1.0 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Gembly BV
- * Build at 20-11-2015
+ * Build at 18-03-2016
  * Released under GNUv3 License 
  */
 
@@ -416,22 +416,27 @@ var GA;
         }
         return GameAnalytics.prototype.init = function(gameKey, secretKey, build, user) {
             var _this = this;
-            if (null === GameAnalytics.instance) throw new Error("No instance available!");
-            this.gameKey = gameKey, this.secretKey = secretKey, this.build = build, this.user = user;
+            if (null === GameAnalytics.instance) throw new Error("No instance Available!");
+            this.gameKey = gameKey, this.secretKey = secretKey, this.build = build, this.user = user, 
+            this.incrementSessionNum(user);
             var initEvent = new GA.Events.Init(GA.Utils.getBaseAnnotations());
             return this.sendEvent(initEvent.toString(), "init", function(response) {
                 _this.initProcessed = !0, response.enabled === !0 && (_this.enabled = !0, _this.timeOffset = (Date.now() / 1e3 | 0) - response.server_ts);
             }), this.scheduleSendData(GameAnalytics.SCHEDULE_TIME), window.addEventListener("beforeunload", function() {
                 _this.sendData();
             }), this;
+        }, GameAnalytics.prototype.incrementSessionNum = function(user) {
+            var sessionNum = GA.Utils.LocalStorage.getItem(user.user_id);
+            sessionNum ? GA.Utils.LocalStorage.setItem(user.user_id, (parseInt(sessionNum) + 1).toString()) : (sessionNum = "1", 
+            GA.Utils.LocalStorage.setItem(user.user_id, sessionNum));
         }, GameAnalytics.prototype.addEvent = function(event) {
-            if (null === GameAnalytics.instance) throw new Error("No instance available!");
+            if (null === GameAnalytics.instance) throw new Error("No instance Available!");
             var m = new GA.Utils.Message(event, GA.Utils.getDefaultAnnotations(this.user, this.sessionId, this.build, this.timeOffset));
             return this.messageQueue.push(m), this;
         }, GameAnalytics.prototype.sendData = function() {
             if (this.initProcessed === !1) return this.scheduleSendData(1e3), this;
             if (this.enabled === !1) return this;
-            if (null === GameAnalytics.instance) throw new Error("No instance available!");
+            if (null === GameAnalytics.instance) throw new Error("No instance Available!");
             for (var data = [], d = ""; this.messageQueue.length > 0; ) {
                 var m = this.messageQueue.pop();
                 data.push(m.data);
@@ -449,7 +454,7 @@ var GA;
                 _this.sendData();
             }, time);
         }, GameAnalytics.prototype.sendEvent = function(databag, event, responseHandler) {
-            if (void 0 === responseHandler && (responseHandler = null), null === GameAnalytics.instance && null === this.gameKey) throw new Error("No instance available!");
+            if (void 0 === responseHandler && (responseHandler = null), null === GameAnalytics.instance && null === this.gameKey) throw new Error("No instance Available!");
             if (!(databag.length < 1)) {
                 var encryptedMessage = CryptoJS.HmacSHA256(databag, this.secretKey), authHeader = CryptoJS.enc.Base64.stringify(encryptedMessage), url = GameAnalytics.API_URL + this.gameKey + "/" + event;
                 GA.Utils.postRequest(url, databag, authHeader, function(response) {
@@ -475,8 +480,12 @@ var GA;
 !function(GA) {
     var User = function() {
         function User(user_id, facebook_id, gender, birth_year) {
-            this.user_id = "", user_id && (this.user_id = user_id), facebook_id && facebook_id.length > 0 && (this.facebook_id = facebook_id, 
-            this.user_id = facebook_id), (1 === gender || 0 === gender) && (this.gender = gender), 
+            if (this.user_id = "", user_id) this.user_id = user_id; else {
+                var user = GA.Utils.LocalStorage.getItem("user");
+                this.user_id = user || GA.Utils.createUniqueUserId();
+            }
+            facebook_id && facebook_id.length > 0 && (this.facebook_id = facebook_id, this.user_id = facebook_id), 
+            GA.Utils.LocalStorage.setItem("user", this.user_id), 1 !== gender && 0 !== gender || (this.gender = gender), 
             birth_year && birth_year.toString().match(/^[0-9]{4}$/gi) && (this.birth_year = birth_year);
         }
         return User;
@@ -500,10 +509,10 @@ var GA;
                 client_ts: (Date.now() / 1e3 | 0) + timeOffset,
                 manufacturer: "unknown",
                 session_id: session_id,
-                session_num: 1,
+                session_num: getSessionNumber(user.user_id),
                 build: build
             };
-            user.facebook_id && (obj.facebook_id = user.facebook_id), (0 === user.gender || 1 === user.gender) && (obj.gender = GA.Gender[user.gender]), 
+            user.facebook_id && (obj.facebook_id = user.facebook_id), 0 !== user.gender && 1 !== user.gender || (obj.gender = GA.Gender[user.gender]), 
             user.birth_year && (obj.birth_year = user.birth_year);
             var ua = navigator.userAgent;
             return ua.match(/iPad|iPod|iPhone/i) ? (obj.platform = GA.Platform[0], obj.device = ua.match(/iPad|iPod|iPhone/i)[0], 
@@ -523,7 +532,32 @@ var GA;
             obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1]), 
             obj;
         }
+        function getSessionNumber(userId) {
+            var sessionNum = Utils.LocalStorage.getItem(userId);
+            return sessionNum ? parseInt(sessionNum) : 1;
+        }
         Utils.getDefaultAnnotations = getDefaultAnnotations, Utils.getBaseAnnotations = getBaseAnnotations;
+    }(Utils = GA.Utils || (GA.Utils = {}));
+}(GA || (GA = {}));
+
+var GA;
+
+!function(GA) {
+    var Utils;
+    !function(Utils) {
+        var LocalStorage = function() {
+            function LocalStorage() {}
+            return LocalStorage.getItem = function(key) {
+                return LocalStorage.Available ? localStorage.getItem(LocalStorage.CacheKey + key) : void 0;
+            }, LocalStorage.setItem = function(key, value) {
+                LocalStorage.Available && localStorage.setItem(LocalStorage.CacheKey + key, value);
+            }, LocalStorage.Available = !1, LocalStorage.CacheKey = "GA:", LocalStorage;
+        }();
+        Utils.LocalStorage = LocalStorage;
+        try {
+            "object" == typeof localStorage && (localStorage.setItem("testingLocalStorage", "yes"), 
+            localStorage.removeItem("testingLocalStorage"), LocalStorage.Available = !0);
+        } catch (e) {}
     }(Utils = GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
@@ -626,6 +660,9 @@ var GA;
                 return v.toString(16);
             });
         }
-        Utils.createUniqueId = createUniqueId;
+        function createUniqueUserId() {
+            return createUniqueId();
+        }
+        Utils.createUniqueId = createUniqueId, Utils.createUniqueUserId = createUniqueUserId;
     }(Utils = GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));

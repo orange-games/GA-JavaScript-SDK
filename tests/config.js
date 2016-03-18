@@ -9,7 +9,7 @@ module.exports = function (config) {
 
 
         // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+        // Available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['mocha', 'chai', 'sinon'],
 
 
@@ -27,7 +27,7 @@ module.exports = function (config) {
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
-        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+        // Available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['progress'],
 
         preprocessors: {
@@ -55,7 +55,7 @@ module.exports = function (config) {
 
 
         // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+        // Available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['PhantomJS'],
 
 

@@ -14,5 +14,10 @@ module GA
                 return v.toString(16);
             });
         }
+
+        export function createUniqueUserId(): string
+        {
+            return createUniqueId();
+        }
     }
 }
