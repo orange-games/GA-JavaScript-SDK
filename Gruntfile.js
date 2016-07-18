@@ -9,7 +9,7 @@ module.exports = function (grunt) {
                 ' *\n' +
                 ' * <%= pkg.author %>\n' +
                 ' * Build at <%= grunt.template.today("dd-mm-yyyy") %>\n' +
-                ' * Released under GNUv3 License \n' +
+                ' * Released under MIT License \n' +
                 ' */\n',
         usebanner: {
             dist: {

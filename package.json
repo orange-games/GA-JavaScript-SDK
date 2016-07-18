@@ -1,6 +1,6 @@
 {
   "name": "ga-javascript-sdk",
-  "author": "Gembly BV",
+  "author": "Orange Games",
   "version": "2.1.0",
   "description": "Unofficial JavaScript SDK for GameAnalytics, REST API v2 version",
   "keywords": [
@@ -10,18 +10,18 @@
   "contributors": [
     {
       "name": "Ale Bles",
-      "email": "ale@gembly.com"
+      "email": "a.bles@orangegames.com"
     }
   ],
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.githubusercontent.com/gembly/GA-JavaScript-SDK/master/LICENSE"
+      "url": "https://raw.githubusercontent.com/orange-games/GA-JavaScript-SDK/master/LICENSE"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/gembly/GA-JavaScript-SDK"
+    "url": "https://github.com/orange-games/GA-JavaScript-SDK"
   },
   "devDependencies": {
     "chai": "^3.4.1",

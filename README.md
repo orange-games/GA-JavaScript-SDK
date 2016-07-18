@@ -5,7 +5,7 @@ GA-JavaScript-SDK is an open-source javascript implementation for [GameAnalytics
 
 This library is fully compliant with the data structures specified in GameAnalytics' REST API docs
 
-If you don't feel like reading any further, or you like to see how it works, [then check out the example in the repo](https://github.com/gembly/GA-JavaScript-SDK/blob/master/example/index.html)!
+If you don't feel like reading any further, or you like to see how it works, [then check out the example in the repo](https://github.com/orange-games/GA-JavaScript-SDK/blob/master/example/index.html)!
 
 Getting Started
 ---------------
@@ -13,7 +13,7 @@ If you don't have an account yet [GameAnalytics](http://www.gameanalytics.com/) 
 
 Set up a game, and make sure you've received a game key and a private key, we need those to talk to GameAnalytics' API.
 
-Once that's out of your way, snatch yourself a copy of this library either from the [repo](https://github.com/gembly/GA-JavaScript-SDK/blob/master/dist/GaJavaScriptSdk.min.js) or catch the latest stable from the [releases](https://github.com/gembly/GA-JavaScript-SDK/releases).
+Once that's out of your way, snatch yourself a copy of this library either from the [repo](https://github.com/orange-games/GA-JavaScript-SDK/blob/master/dist/GaJavaScriptSdk.min.js) or catch the latest stable from the [releases](https://github.com/orange-games/GA-JavaScript-SDK/releases).
 
 Include in your project like you usually do:
 
@@ -220,7 +220,7 @@ Also note that the events are queued and drained every 15s, so it might take som
 
 The library also sends an Init event to GameAnalytics, this is to check if a user is allowed to send events, if the user isn't then events won't be send so we don't hammer GameAnalytics unnecessary.
 
-**Still having trouble? Submit an [issue](https://github.com/gembly/GA-JavaScript-SDK/issues)**
+**Still having trouble? Submit an [issue](https://github.com/orange-games/GA-JavaScript-SDK/issues)**
 
 Changelog
 ---------

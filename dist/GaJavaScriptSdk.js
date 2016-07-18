@@ -2,9 +2,9 @@
  * ga-javascript-sdk - version 2.1.0 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
- * Gembly BV
- * Build at 18-03-2016
- * Released under GNUv3 License 
+ * Orange Games
+ * Build at 18-07-2016
+ * Released under MIT License 
  */
 
 var CryptoJS = CryptoJS || function(h, s) {
