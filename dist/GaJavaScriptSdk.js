@@ -1,9 +1,9 @@
 /*!
- * ga-javascript-sdk - version 2.1.0 
+ * ga-javascript-sdk - version 2.1.1 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Orange Games
- * Build at 18-07-2016
+ * Build at 15-11-2017
  * Released under MIT License 
  */
 
@@ -517,7 +517,8 @@ var GA;
             var ua = navigator.userAgent;
             return ua.match(/iPad|iPod|iPhone/i) ? (obj.platform = GA.Platform[0], obj.device = ua.match(/iPad|iPod|iPhone/i)[0], 
             obj.manufacturer = "Apple", obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".")) : ua.match(/Android/i) ? (obj.platform = GA.Platform[1], 
-            obj.device = ua.match(/Mobile/i) ? "Phone" : "Tablet", obj.os_version = GA.Platform[1] + " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1]) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
+            obj.device = ua.match(/Mobile/i) ? "Phone" : "Tablet", obj.os_version = GA.Platform[1], 
+            /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
             obj.device = "Windows Phone", obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1]), 
             obj;
         }
@@ -528,7 +529,7 @@ var GA;
                 os_version: "unknown"
             }, ua = navigator.userAgent;
             return ua.match(/iPad|iPod|iPhone/i) ? (obj.platform = GA.Platform[0], obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".")) : ua.match(/Android/i) ? (obj.platform = GA.Platform[1], 
-            obj.os_version = GA.Platform[1] + " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1]) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
+            obj.os_version = GA.Platform[1], /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
             obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1]), 
             obj;
         }

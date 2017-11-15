@@ -97,7 +97,10 @@ module GA
                 obj.platform = GA.Platform[GA.Platform.android];
                 obj.device = (ua.match(/Mobile/i)) ? 'Phone' : 'Tablet';
 
-                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                obj.os_version = GA.Platform[GA.Platform.android];
+                if (!/Firefox/i.test(ua)) {
+                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                }
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
                 obj.platform = GA.Platform[GA.Platform.windows];
@@ -129,7 +132,10 @@ module GA
                 //code for Android here
                 obj.platform = GA.Platform[GA.Platform.android];
 
-                obj.os_version = GA.Platform[GA.Platform.android] + ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                obj.os_version = GA.Platform[GA.Platform.android];
+                if (!/Firefox/i.test(ua)) {
+                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                }
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
                 obj.platform = GA.Platform[GA.Platform.windows];
