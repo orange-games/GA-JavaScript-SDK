@@ -99,7 +99,7 @@ module GA
 
                 obj.os_version = GA.Platform[GA.Platform.android];
                 if (!/Firefox/i.test(ua)) {
-                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)*);/)[1];
                 }
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here
@@ -134,7 +134,7 @@ module GA
 
                 obj.os_version = GA.Platform[GA.Platform.android];
                 if (!/Firefox/i.test(ua)) {
-                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)+);/)[1];
+                    obj.os_version += ' ' + ua.match(/Android (\d+(?:\.\d+)*);/)[1];
                 }
             } else if(ua.match(/Windows Phone/i)){
                 //code for Windows phone here

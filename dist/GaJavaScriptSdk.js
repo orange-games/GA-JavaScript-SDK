@@ -1,9 +1,9 @@
 /*!
- * ga-javascript-sdk - version 2.1.1 
+ * ga-javascript-sdk - version 2.1.2 
  * Unofficial JavaScript SDK for GameAnalytics, REST API v2 version
  *
  * Orange Games
- * Build at 15-11-2017
+ * Build at 01-10-2018
  * Released under MIT License 
  */
 
@@ -37,44 +37,44 @@ var CryptoJS = CryptoJS || function(h, s) {
         },
         concat: function(a) {
             var c = this.words, d = a.words, b = this.sigBytes;
-            if (a = a.sigBytes, this.clamp(), b % 4) for (var e = 0; a > e; e++) c[b + e >>> 2] |= (d[e >>> 2] >>> 24 - 8 * (e % 4) & 255) << 24 - 8 * ((b + e) % 4); else if (65535 < d.length) for (e = 0; a > e; e += 4) c[b + e >>> 2] = d[e >>> 2]; else c.push.apply(c, d);
+            if (a = a.sigBytes, this.clamp(), b % 4) for (var e = 0; e < a; e++) c[b + e >>> 2] |= (d[e >>> 2] >>> 24 - e % 4 * 8 & 255) << 24 - (b + e) % 4 * 8; else if (65535 < d.length) for (e = 0; e < a; e += 4) c[b + e >>> 2] = d[e >>> 2]; else c.push.apply(c, d);
             return this.sigBytes += a, this;
         },
         clamp: function() {
             var a = this.words, c = this.sigBytes;
-            a[c >>> 2] &= 4294967295 << 32 - 8 * (c % 4), a.length = h.ceil(c / 4);
+            a[c >>> 2] &= 4294967295 << 32 - c % 4 * 8, a.length = h.ceil(c / 4);
         },
         clone: function() {
             var a = m.clone.call(this);
             return a.words = this.words.slice(0), a;
         },
         random: function(a) {
-            for (var c = [], d = 0; a > d; d += 4) c.push(4294967296 * h.random() | 0);
+            for (var c = [], d = 0; d < a; d += 4) c.push(4294967296 * h.random() | 0);
             return new r.init(c, a);
         }
     }), l = f.enc = {}, k = l.Hex = {
         stringify: function(a) {
             var c = a.words;
             a = a.sigBytes;
-            for (var d = [], b = 0; a > b; b++) {
-                var e = c[b >>> 2] >>> 24 - 8 * (b % 4) & 255;
+            for (var d = [], b = 0; b < a; b++) {
+                var e = c[b >>> 2] >>> 24 - b % 4 * 8 & 255;
                 d.push((e >>> 4).toString(16)), d.push((15 & e).toString(16));
             }
             return d.join("");
         },
         parse: function(a) {
-            for (var c = a.length, d = [], b = 0; c > b; b += 2) d[b >>> 3] |= parseInt(a.substr(b, 2), 16) << 24 - 4 * (b % 8);
+            for (var c = a.length, d = [], b = 0; b < c; b += 2) d[b >>> 3] |= parseInt(a.substr(b, 2), 16) << 24 - b % 8 * 4;
             return new r.init(d, c / 2);
         }
     }, n = l.Latin1 = {
         stringify: function(a) {
             var c = a.words;
             a = a.sigBytes;
-            for (var d = [], b = 0; a > b; b++) d.push(String.fromCharCode(c[b >>> 2] >>> 24 - 8 * (b % 4) & 255));
+            for (var d = [], b = 0; b < a; b++) d.push(String.fromCharCode(c[b >>> 2] >>> 24 - b % 4 * 8 & 255));
             return d.join("");
         },
         parse: function(a) {
-            for (var c = a.length, d = [], b = 0; c > b; b++) d[b >>> 2] |= (255 & a.charCodeAt(b)) << 24 - 8 * (b % 4);
+            for (var c = a.length, d = [], b = 0; b < c; b++) d[b >>> 2] |= (255 & a.charCodeAt(b)) << 24 - b % 4 * 8;
             return new r.init(d, c);
         }
     }, j = l.Utf8 = {
@@ -98,7 +98,7 @@ var CryptoJS = CryptoJS || function(h, s) {
         _process: function(a) {
             var c = this._data, d = c.words, b = c.sigBytes, e = this.blockSize, f = b / (4 * e), f = a ? h.ceil(f) : h.max((0 | f) - this._minBufferSize, 0);
             if (a = f * e, b = h.min(4 * a, b), a) {
-                for (var g = 0; a > g; g += e) this._doProcessBlock(d, g);
+                for (var g = 0; g < a; g += e) this._doProcessBlock(d, g);
                 g = d.splice(0, a), c.sigBytes -= b;
             }
             return new r.init(g, b);
@@ -146,7 +146,7 @@ var CryptoJS = CryptoJS || function(h, s) {
         var j;
         a: {
             j = k;
-            for (var u = h.sqrt(j), t = 2; u >= t; t++) if (!(j % t)) {
+            for (var u = h.sqrt(j), t = 2; t <= u; t++) if (!(j % t)) {
                 j = !1;
                 break a;
             }
@@ -173,8 +173,8 @@ var CryptoJS = CryptoJS || function(h, s) {
         },
         _doFinalize: function() {
             var a = this._data, d = a.words, b = 8 * this._nDataBytes, e = 8 * a.sigBytes;
-            return d[e >>> 5] |= 128 << 24 - e % 32, d[(e + 64 >>> 9 << 4) + 14] = h.floor(b / 4294967296), 
-            d[(e + 64 >>> 9 << 4) + 15] = b, a.sigBytes = 4 * d.length, this._process(), this._hash;
+            return d[e >>> 5] |= 128 << 24 - e % 32, d[14 + (e + 64 >>> 9 << 4)] = h.floor(b / 4294967296), 
+            d[15 + (e + 64 >>> 9 << 4)] = b, a.sigBytes = 4 * d.length, this._process(), this._hash;
         },
         clone: function() {
             var a = q.clone.call(this);
@@ -189,7 +189,7 @@ var CryptoJS = CryptoJS || function(h, s) {
             f = this._hasher = new f.init(), "string" == typeof g && (g = s.parse(g));
             var h = f.blockSize, m = 4 * h;
             g.sigBytes > m && (g = f.finalize(g)), g.clamp();
-            for (var r = this._oKey = g.clone(), l = this._iKey = g.clone(), k = r.words, n = l.words, j = 0; h > j; j++) k[j] ^= 1549556828, 
+            for (var r = this._oKey = g.clone(), l = this._iKey = g.clone(), k = r.words, n = l.words, j = 0; j < h; j++) k[j] ^= 1549556828, 
             n[j] ^= 909522486;
             r.sigBytes = l.sigBytes = m, this.reset();
         },
@@ -211,16 +211,16 @@ var CryptoJS = CryptoJS || function(h, s) {
         stringify: function(b) {
             var e = b.words, f = b.sigBytes, c = this._map;
             b.clamp(), b = [];
-            for (var a = 0; f > a; a += 3) for (var d = (e[a >>> 2] >>> 24 - 8 * (a % 4) & 255) << 16 | (e[a + 1 >>> 2] >>> 24 - 8 * ((a + 1) % 4) & 255) << 8 | e[a + 2 >>> 2] >>> 24 - 8 * ((a + 2) % 4) & 255, g = 0; 4 > g && f > a + .75 * g; g++) b.push(c.charAt(d >>> 6 * (3 - g) & 63));
+            for (var a = 0; a < f; a += 3) for (var d = (e[a >>> 2] >>> 24 - a % 4 * 8 & 255) << 16 | (e[a + 1 >>> 2] >>> 24 - (a + 1) % 4 * 8 & 255) << 8 | e[a + 2 >>> 2] >>> 24 - (a + 2) % 4 * 8 & 255, g = 0; 4 > g && a + .75 * g < f; g++) b.push(c.charAt(d >>> 6 * (3 - g) & 63));
             if (e = c.charAt(64)) for (;b.length % 4; ) b.push(e);
             return b.join("");
         },
         parse: function(b) {
             var e = b.length, f = this._map, c = f.charAt(64);
-            c && (c = b.indexOf(c), -1 != c && (e = c));
-            for (var c = [], a = 0, d = 0; e > d; d++) if (d % 4) {
-                var g = f.indexOf(b.charAt(d - 1)) << 2 * (d % 4), h = f.indexOf(b.charAt(d)) >>> 6 - 2 * (d % 4);
-                c[a >>> 2] |= (g | h) << 24 - 8 * (a % 4), a++;
+            c && -1 != (c = b.indexOf(c)) && (e = c);
+            for (var c = [], a = 0, d = 0; d < e; d++) if (d % 4) {
+                var g = f.indexOf(b.charAt(d - 1)) << d % 4 * 2, h = f.indexOf(b.charAt(d)) >>> 6 - d % 4 * 2;
+                c[a >>> 2] |= (g | h) << 24 - a % 4 * 8, a++;
             }
             return j.create(c, a);
         },
@@ -248,7 +248,6 @@ var GA;
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var eventIdCheck = /^[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}$/, Business = function() {
             function Business(event_id, amount, currency, transaction_num, cart_type, receipt_info) {
@@ -263,13 +262,12 @@ var GA;
             return Business;
         }();
         Events.Business = Business;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var eventIdCheck = /^[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}(:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}){0,4}$/, Design = function() {
             function Design(event_id, value) {
@@ -279,13 +277,12 @@ var GA;
             return Design;
         }();
         Events.Design = Design;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         !function(Category) {
             Category[Category.design = 0] = "design", Category[Category.business = 1] = "business", 
@@ -293,13 +290,12 @@ var GA;
             Category[Category.progression = 5] = "progression", Category[Category.resource = 6] = "resource";
         }(Events.Category || (Events.Category = {}));
         Events.Category;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         !function(ErrorSeverity) {
             ErrorSeverity[ErrorSeverity.debug = 0] = "debug", ErrorSeverity[ErrorSeverity.info = 1] = "info", 
@@ -313,13 +309,12 @@ var GA;
             return Exception;
         }();
         Events.Exception = Exception;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var InitResponse = function() {
             function InitResponse() {}
@@ -335,13 +330,12 @@ var GA;
             }, Init;
         }();
         Events.Init = Init;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var eventIdCheck = /^(Start|Fail|Complete):[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}(:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}){0,2}$/, Progression = function() {
             function Progression(event_id, attempt_num, score) {
@@ -352,13 +346,12 @@ var GA;
             return Progression;
         }();
         Events.Progression = Progression;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var eventIdCheck = /^(Sink|Source):[A-Za-z]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}:[A-Za-z0-9\\s\\-_\\.\\(\\)\\!\\?]{1,64}/, Resource = function() {
             function Resource(event_id, amount) {
@@ -368,13 +361,12 @@ var GA;
             return Resource;
         }();
         Events.Resource = Resource;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var SessionEnd = function() {
             function SessionEnd(length) {
@@ -383,13 +375,12 @@ var GA;
             return SessionEnd;
         }();
         Events.SessionEnd = SessionEnd;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Events;
     !function(Events) {
         var User = function() {
             function User() {
@@ -398,7 +389,7 @@ var GA;
             return User;
         }();
         Events.User = User;
-    }(Events = GA.Events || (GA.Events = {}));
+    }(GA.Events || (GA.Events = {}));
 }(GA || (GA = {}));
 
 var GA;
@@ -421,7 +412,7 @@ var GA;
             this.incrementSessionNum(user);
             var initEvent = new GA.Events.Init(GA.Utils.getBaseAnnotations());
             return this.sendEvent(initEvent.toString(), "init", function(response) {
-                _this.initProcessed = !0, response.enabled === !0 && (_this.enabled = !0, _this.timeOffset = (Date.now() / 1e3 | 0) - response.server_ts);
+                _this.initProcessed = !0, !0 === response.enabled && (_this.enabled = !0, _this.timeOffset = (Date.now() / 1e3 | 0) - response.server_ts);
             }), this.scheduleSendData(GameAnalytics.SCHEDULE_TIME), window.addEventListener("beforeunload", function() {
                 _this.sendData();
             }), this;
@@ -434,8 +425,8 @@ var GA;
             var m = new GA.Utils.Message(event, GA.Utils.getDefaultAnnotations(this.user, this.sessionId, this.build, this.timeOffset));
             return this.messageQueue.push(m), this;
         }, GameAnalytics.prototype.sendData = function() {
-            if (this.initProcessed === !1) return this.scheduleSendData(1e3), this;
-            if (this.enabled === !1) return this;
+            if (!1 === this.initProcessed) return this.scheduleSendData(1e3), this;
+            if (!1 === this.enabled) return this;
             if (null === GameAnalytics.instance) throw new Error("No instance Available!");
             for (var data = [], d = ""; this.messageQueue.length > 0; ) {
                 var m = this.messageQueue.pop();
@@ -458,7 +449,7 @@ var GA;
             if (!(databag.length < 1)) {
                 var encryptedMessage = CryptoJS.HmacSHA256(databag, this.secretKey), authHeader = CryptoJS.enc.Base64.stringify(encryptedMessage), url = GameAnalytics.API_URL + this.gameKey + "/" + event;
                 GA.Utils.postRequest(url, databag, authHeader, function(response) {
-                    if (response.success === !1 && window.console && console.log(response.message), 
+                    if (!1 === response.success && window.console && console.log(response.message), 
                     null != responseHandler) {
                         var r = "";
                         try {
@@ -496,7 +487,6 @@ var GA;
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         function getDefaultAnnotations(user, session_id, build, timeOffset) {
             var obj = {
@@ -518,7 +508,7 @@ var GA;
             return ua.match(/iPad|iPod|iPhone/i) ? (obj.platform = GA.Platform[0], obj.device = ua.match(/iPad|iPod|iPhone/i)[0], 
             obj.manufacturer = "Apple", obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".")) : ua.match(/Android/i) ? (obj.platform = GA.Platform[1], 
             obj.device = ua.match(/Mobile/i) ? "Phone" : "Tablet", obj.os_version = GA.Platform[1], 
-            /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
+            /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)*);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
             obj.device = "Windows Phone", obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1]), 
             obj;
         }
@@ -529,7 +519,7 @@ var GA;
                 os_version: "unknown"
             }, ua = navigator.userAgent;
             return ua.match(/iPad|iPod|iPhone/i) ? (obj.platform = GA.Platform[0], obj.os_version = GA.Platform[0] + " " + ua.match(/OS (\b[0-9]+_[0-9]+(?:_[0-9]+)?\b)/)[1].replace(/_/gi, ".")) : ua.match(/Android/i) ? (obj.platform = GA.Platform[1], 
-            obj.os_version = GA.Platform[1], /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)+);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
+            obj.os_version = GA.Platform[1], /Firefox/i.test(ua) || (obj.os_version += " " + ua.match(/Android (\d+(?:\.\d+)*);/)[1])) : ua.match(/Windows Phone/i) && (obj.platform = GA.Platform[2], 
             obj.os_version = GA.Platform[2] + " " + ua.match(/Phone (\d+(?:\.\d+)+);/)[1]), 
             obj;
         }
@@ -538,18 +528,17 @@ var GA;
             return sessionNum ? parseInt(sessionNum) : 1;
         }
         Utils.getDefaultAnnotations = getDefaultAnnotations, Utils.getBaseAnnotations = getBaseAnnotations;
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         var LocalStorage = function() {
             function LocalStorage() {}
             return LocalStorage.getItem = function(key) {
-                return LocalStorage.Available ? localStorage.getItem(LocalStorage.CacheKey + key) : void 0;
+                if (LocalStorage.Available) return localStorage.getItem(LocalStorage.CacheKey + key);
             }, LocalStorage.setItem = function(key, value) {
                 LocalStorage.Available && localStorage.setItem(LocalStorage.CacheKey + key, value);
             }, LocalStorage.Available = !1, LocalStorage.CacheKey = "GA:", LocalStorage;
@@ -559,13 +548,12 @@ var GA;
             "object" == typeof localStorage && (localStorage.setItem("testingLocalStorage", "yes"), 
             localStorage.removeItem("testingLocalStorage"), LocalStorage.Available = !0);
         } catch (e) {}
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         var Message = function() {
             function Message(event, annotations) {
@@ -573,7 +561,7 @@ var GA;
             }
             return Object.defineProperty(Message.prototype, "data", {
                 get: function() {
-                    for (var property in this.event) this.event.hasOwnProperty(property) && ("category" === property ? this.annotations[property] = GA.Events.Category[this.event[property]] : this.annotations[property] = this.event[property]);
+                    for (var property in this.event) this.event.hasOwnProperty(property) && (this.annotations[property] = "category" === property ? GA.Events.Category[this.event[property]] : this.event[property]);
                     return this.annotations;
                 },
                 enumerable: !0,
@@ -581,13 +569,12 @@ var GA;
             }), Message;
         }();
         Utils.Message = Message;
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         var MessageQueue = function() {
             function MessageQueue() {
@@ -607,13 +594,12 @@ var GA;
             MessageQueue;
         }();
         Utils.MessageQueue = MessageQueue;
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         function postRequest(url, data, authHeader, callback) {
             var xhr;
@@ -647,23 +633,22 @@ var GA;
             return Response;
         }();
         Utils.Response = Response, Utils.postRequest = postRequest;
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));
 
 var GA;
 
 !function(GA) {
-    var Utils;
     !function(Utils) {
         function createUniqueId() {
             return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-                var r = 16 * Math.random() | 0, v = "x" == c ? r : 3 & r | 8;
-                return v.toString(16);
+                var r = 16 * Math.random() | 0;
+                return ("x" == c ? r : 3 & r | 8).toString(16);
             });
         }
         function createUniqueUserId() {
             return createUniqueId();
         }
         Utils.createUniqueId = createUniqueId, Utils.createUniqueUserId = createUniqueUserId;
-    }(Utils = GA.Utils || (GA.Utils = {}));
+    }(GA.Utils || (GA.Utils = {}));
 }(GA || (GA = {}));

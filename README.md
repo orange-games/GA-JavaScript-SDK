@@ -225,6 +225,12 @@ The library also sends an Init event to GameAnalytics, this is to check if a use
 Changelog
 ---------
 
+**2.1.2**
+* Fix for Android Pie
+
+**2.1.1**
+* Fix for Firefox / Android
+
 **2.1.0**
 * Changed the way userId's are handled and made sure session_num is used
 
